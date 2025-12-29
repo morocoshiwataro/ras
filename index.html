@@ -217,7 +217,7 @@
     <header>
       <h1>荒野の王 兵士数/ポイント計算</h1>
       <div class="sub">
-        入力は上から順にお願いします。両方入力すると「目的（A/B）」が表示されます。
+        入力は上から順にお願いします。
       </div>
     </header>
 
@@ -225,21 +225,21 @@
 
       <!-- Step 1 -->
       <div class="section" id="step1">
-        <div class="sectionTitle"><span class="step">1</span>まずは基本情報</div>
+        <div class="sectionTitle"><span class="step">1</span>基本情報</div>
 
         <div class="grid two">
           <div>
-            <label>① 病院容量（現在の深部容量）<span class="req">必須</span></label>
-            <img class="shot" id="shot_hospital" alt="スクショ例（仮）" />
-            <input id="hospitalCap" type="number" min="0" step="1" placeholder="例：132750" />
+            <label>病院容量（※現在の深部治療センターの空き）<span class="req">必須</span></label>
+            <img class="shot" src="images/01.png" alt="病院容量の確認画面" />
+                      <input id="hospitalCap" type="number" min="0" step="1" placeholder="例：132750" />
             <div class="hint">単位：人</div>
           </div>
 
           <div>
             <label>② アフターショック率（%）<span class="req">必須</span></label>
-            <img class="shot" id="shot_aftershock" alt="スクショ例（仮）" />
+            <img class="shot" src="images/02.png" alt="アフターショック率の確認画面" />
             <input id="aftershockRate" type="number" min="0" step="0.01" placeholder="例：14" />
-            <div class="hint">入力は「%の数値」（14% → 14）</div>
+            <div class="hint">入力は「%の数値」（11.5% → 11.5）</div>
           </div>
         </div>
       </div>
@@ -248,31 +248,30 @@
       <div class="section hidden" id="step2">
         <div class="sectionTitle"><span class="step">2</span>目的を選ぶ</div>
 
-        <label>A/B どちら？<span class="req">必須</span></label>
+        <label>今回の荒野の王では、どちらを重視しますか？<span class="req">必須</span></label>
         <select id="mode">
           <option value="">選択してください</option>
-          <option value="A">A：兵士をたくさん増やしたい（安全上限→内訳入力）</option>
-          <option value="B">B：ポイントから逆算したい（目標実ポイント→必要人数）</option>
+          <option value="A">兵士を増やす！（最大まで訓練バフを獲得する）</option>
+          <option value="B">ポイント重視！（キリのいい目標ポイントを目指す）</option>
         </select>
-        <div class="hint">選んだ目的に合わせて、この下の入力欄が表示されます。</div>
       </div>
 
       <!-- A -->
       <div class="section hidden" id="sectionA">
-        <div class="sectionTitle"><span class="step">A</span>A：入力</div>
+        <div class="sectionTitle"><span class="step">A</span>兵士を増やす！（最大まで訓練バフを獲得する）</div>
 
         <!-- keep safety limit near the top -->
         <div class="results" style="margin-top: 6px;">
           <div class="kpi">
-            <div class="name">安全に突撃できる最大兵士数（推奨上限）</div>
+            <div class="name">突撃できる最大兵士数（推奨上限）</div>
             <div class="value"><span id="aMaxSafe">-</span><span class="unit">人</span></div>
-            <div class="mini">式：① ÷（0.7 + ②×0.003）</div>
+            <div class="mini">これ以上で突撃すると、深部治療センターに収まらずギルド病院に入ります。（要ギルドコイン）</div>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <div class="hint">各ランクの突撃人数を入力してください（表の入力欄にもスクショ例を付けています）</div>
+        <div class="hint">以下に各ランクの突撃人数を入力すると、獲得できるポイントがわかります。</div>
 
         <div class="tableWrap">
           <table>
@@ -280,7 +279,7 @@
               <tr>
                 <th>兵士ランク</th>
                 <th>突撃人数</th>
-                <th>ポイント小計（実ポイント）</th>
+                <th>ポイント小計（死亡数ポイント）</th>
               </tr>
             </thead>
             <tbody id="aTableBody"></tbody>
@@ -290,11 +289,11 @@
         <!-- A results moved UNDER the rank inputs -->
         <div class="results">
           <div class="kpi">
-            <div class="name">合計ポイント（実ポイント）</div>
+            <div class="name">合計ポイント（死亡数ポイント）</div>
             <div class="value"><span id="aTotalPoints">-</span><span class="unit">pt</span></div>
           </div>
           <div class="kpi">
-            <div class="name">入力した突撃人数 合計</div>
+            <div class="name">入力した突撃人数の合計</div>
             <div class="value"><span id="aTotalSoldiers">-</span><span class="unit">人</span></div>
           </div>
         </div>
@@ -304,34 +303,36 @@
 
       <!-- B -->
       <div class="section hidden" id="sectionB">
-        <div class="sectionTitle"><span class="step">B</span>B：入力</div>
+        <div class="sectionTitle"><span class="step">B</span>ポイント重視！（キリのいい目標ポイントを目指す）</div>
 
         <!-- target: 1 row -->
         <div class="grid">
           <div>
-            <label>③ ほしい実ポイント（目標）<span class="req">必須</span></label>
-            <input id="targetPoints" type="number" min="0" step="1" placeholder="例：50525" />
+            <label>目標ポイント（ほしいポイント数）<span class="req">必須</span></label>
+            <input id="targetPoints" type="number" min="0" step="1" placeholder="例：5000" />
           </div>
         </div>
 
         <!-- current real + current death: 1 row -->
         <div class="grid two">
           <div>
-            <label>現在獲得している実ポイント<span class="req">必須</span></label>
+            <label>現在獲得しているポイント<span class="req">必須</span></label>
             <img class="shot" id="shot_cur_real" alt="スクショ例（仮）" />
-            <input id="currentRealPoints" type="number" min="0" step="1" placeholder="例：12000" />
+            <input id="currentRealPoints" type="number" min="0" step="1" placeholder="例：2000" />
+            <div class="hint">まだポイントを獲得していない場合、0と入れてください</div>
           </div>
           <div>
-            <label>現在の死亡数ポイント（累計）<span class="req">必須</span></label>
-            <img class="shot" id="shot_cur_death" alt="スクショ例（仮）" />
+            <label>現在の死亡数ポイント<span class="req">必須</span></label>
+            <img class="shot" src="images/01.png" alt="現在の死亡数ポイントの確認画面" />
             <input id="currentDeathPoints" type="number" min="0" step="1" placeholder="例：200000" />
+            <div class="hint">まだポイントを獲得していない場合、0と入れてください</div>
           </div>
         </div>
 
         <!-- main rank: 1 row -->
         <div class="grid">
           <div>
-            <label>メインで突撃させる兵士ランク<span class="req">必須</span></label>
+            <label>メインで突撃させる兵士のランク<span class="req">必須</span></label>
             <select id="mainRank"></select>
           </div>
         </div>
@@ -339,19 +340,21 @@
         <!-- B results: BEFORE irregular (no sub) -->
         <div class="results">
           <div class="kpi">
-            <div class="name">不足実ポイント（目標−現在）</div>
+            <div class="name">不足ポイント（目標−現在）</div>
             <div class="value"><span id="bNeedPoints">-</span><span class="unit">pt</span></div>
           </div>
 
           <div class="kpi">
-            <div class="name">結論：メイン突撃人数</div>
+            <div class="name">メイン突撃人数</div>
             <div class="value"><span id="bMainSoldiers">-</span><span class="unit">人</span></div>
+            <div class="mini">主に突撃させるランクの兵士数</div>
           </div>
 
           <!-- sub result appears ONLY when irregular ON -->
           <div class="kpi hidden" id="bSubCard">
-            <div class="name">結論：サブ突撃人数</div>
+            <div class="name">サブ突撃人数</div>
             <div class="value"><span id="bSubSoldiers">-</span><span class="unit">人</span></div>
+            <div class="mini">1種類の兵士ランクでは不足する際、追加で突撃させるランクの兵士数</div>
           </div>
         </div>
 
@@ -365,12 +368,10 @@
           <div class="grid two">
             <div>
               <label>サブで突撃させる兵士ランク<span class="req">必須</span></label>
-              <img class="shot" id="shot_sub_rank" alt="スクショ例（仮）" />
               <select id="subRank"></select>
             </div>
             <div>
-              <label>⑥ メインで突撃させる兵士数（手入力）<span class="req">必須</span></label>
-              <img class="shot" id="shot_main_manual" alt="スクショ例（仮）" />
+              <label>メインで突撃させる兵士数（手入力）<span class="req">必須</span></label>
               <input id="mainCountManual" type="number" min="0" step="1" placeholder="例：20000" />
             </div>
           </div>
@@ -378,11 +379,11 @@
           <!-- After irregular ON: show ONLY one sub number (sub soldiers) -->
           <div class="results">
             <div class="kpi">
-              <div class="name">結論：メイン突撃人数</div>
+              <div class="name">メインで突撃する人数</div>
               <div class="value"><span id="iMainConclusion">-</span><span class="unit">人</span></div>
             </div>
             <div class="kpi">
-              <div class="name">結論：サブ突撃人数</div>
+              <div class="name">サブで突撃する人数</div>
               <div class="value"><span id="iSubConclusion">-</span><span class="unit">人</span></div>
             </div>
           </div>
@@ -394,6 +395,7 @@
       <footer>
         <b>利用条件</b><br/>
         本ページは、閲覧者が個人的に計算を行う目的に限り利用できます。<br/>
+        また、作者morocoshiwataroに許可なく本URLを外部に渡すことを禁止します。その場合、本ページを閉鎖する可能性があります。<br/>
         本ページの計算内容・ロジック・数式・ソースコード等の転載は禁止での転載・流用・再配布・二次利用（別サイト/アプリ等への組み込みを含む）を禁止します。
       </footer>
 
