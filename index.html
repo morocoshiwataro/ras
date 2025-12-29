@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>荒野の王（WK）計算フォーム</title>
+  <title>荒野の王 兵士数/ポイント計算</title>
   <style>
     :root{
       --bg: #0f0c07;
@@ -215,9 +215,9 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>荒野の王（WK）計算フォーム</h1>
+      <h1>荒野の王 兵士数/ポイント計算</h1>
       <div class="sub">
-        入力は上から順番に。①②が揃うと「目的（A/B）」が表示されます。
+        入力は上から順にお願いします。両方入力すると「目的（A/B）」が表示されます。
       </div>
     </header>
 
@@ -430,9 +430,14 @@
   const $ = (id) => document.getElementById(id);
 
   function num(v, fallback = NaN) {
+    // 空欄は 0 扱いにしない（未入力として扱う）
+    if (v === null || v === undefined) return fallback;
+    if (typeof v === "string" && v.trim() === "") return fallback;
+
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
   }
+
   function fmt(n) {
     if (!Number.isFinite(n)) return "-";
     return Math.round(n).toLocaleString("ja-JP");
