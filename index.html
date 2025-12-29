@@ -249,7 +249,6 @@
         <div class="sectionTitle"><span class="step">2</span>目的を選ぶ</div>
 
         <label>A/B どちら？<span class="req">必須</span></label>
-        <img class="shot" id="shot_mode" alt="スクショ例（仮）" />
         <select id="mode">
           <option value="">選択してください</option>
           <option value="A">A：兵士をたくさん増やしたい（安全上限→内訳入力）</option>
@@ -311,7 +310,6 @@
         <div class="grid">
           <div>
             <label>③ ほしい実ポイント（目標）<span class="req">必須</span></label>
-            <img class="shot" id="shot_target" alt="スクショ例（仮）" />
             <input id="targetPoints" type="number" min="0" step="1" placeholder="例：50525" />
           </div>
         </div>
@@ -334,7 +332,6 @@
         <div class="grid">
           <div>
             <label>メインで突撃させる兵士ランク<span class="req">必須</span></label>
-            <img class="shot" id="shot_main_rank" alt="スクショ例（仮）" />
             <select id="mainRank"></select>
           </div>
         </div>
@@ -556,7 +553,7 @@
     for (const r of Object.keys(RANK_POINTS)) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${r}<img class="shot sm" alt="スクショ例（仮）" src="${svgShot("A："+r+" の入力欄")}" /></td>
+        <td>${r}</td>
         <td>
           <input class="smallInput aCount" data-rank="${r}" type="number" min="0" step="1" placeholder="0" />
         </td>
@@ -751,11 +748,8 @@
   // Init screenshots
   $("shot_hospital").src = svgShot("① 病院容量（深部容量）");
   $("shot_aftershock").src = svgShot("② アフターショック率");
-  $("shot_mode").src = svgShot("A / B の目的選択");
-  $("shot_target").src = svgShot("③ ほしい実ポイント（目標）");
   $("shot_cur_real").src = svgShot("現在獲得している実ポイント");
   $("shot_cur_death").src = svgShot("現在の死亡数ポイント（累計）");
-  $("shot_main_rank").src = svgShot("メイン兵士ランク");
   $("shot_sub_rank").src = svgShot("サブ兵士ランク");
   $("shot_main_manual").src = svgShot("⑥ メイン突撃人数（手入力）");
 
