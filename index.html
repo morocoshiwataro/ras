@@ -186,6 +186,38 @@
     }
     tr:last-child td{ border-bottom: none; }
 
+    /* A：合計（筆算っぽく表示） */
+    .sumBox{
+      padding: 10px 10px 12px;
+    }
+    .sumBox .bar{
+      height: 1px;
+      background: rgba(255,255,255,.22);
+      margin: 6px 0 8px;
+    }
+    .sumBox .sumLine{
+      display:flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .sumBox .label{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sumBox .num{
+      font-size: 16px;
+      font-weight: 950;
+      color: rgba(255,255,255,.92);
+    }
+    .sumBox .unit{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     .smallInput{
       padding: 10px 10px;
       border-radius: 12px;
@@ -317,13 +349,22 @@
             </thead>
             <tbody id="aTableBody"></tbody>
           </table>
+          <!-- 合計（筆算っぽく）: 右下に表示 -->
+          <div class="sumBox">
+            <div class="bar"></div>
+            <div class="sumLine">
+              <span class="label">合計（死亡数ポイント）</span>
+              <span class="num" id="aTotalPointsInline">-</span>
+              <span class="unit">ポイント</span>
+            </div>
+          </div>
         </div>
 
         <!-- A results moved UNDER the rank inputs -->
         <div class="results">
           <div class="kpi">
-            <div class="name">合計ポイント（死亡数ポイント）</div>
-            <div class="value"><span id="aTotalPoints">-</span><span class="unit">pt</span></div>
+            <div class="name">死亡数ポイントで獲得できる実ポイント（目安）</div>
+            <div class="value"><span id="aDeathBonusRealPoints">-</span><span class="unit">ポイント</span></div>
           </div>
           <div class="kpi">
             <div class="name">入力した突撃人数の合計</div>
@@ -374,7 +415,7 @@
         <div class="results">
           <div class="kpi">
             <div class="name">不足ポイント（目標−現在）</div>
-            <div class="value"><span id="bNeedPoints">-</span><span class="unit">pt</span></div>
+            <div class="value"><span id="bNeedPoints">-</span><span class="unit">ポイント</span></div>
           </div>
 
           <div class="kpi">
@@ -617,6 +658,11 @@
     });
 
     $("aTotalSoldiers").textContent = fmt(totalSoldiers);
+    // 表の右下（筆算）に、死亡数ポイント合計
+    if ($("aTotalPointsInline")) $("aTotalPointsInline").textContent = fmt(totalPoints);
+    // KPI側に、死亡数ポイント報酬の「実ポイント（目安）」
+    if ($("aDeathBonusRealPoints")) $("aDeathBonusRealPoints").textContent = fmt(pointsFromDeathPoints(totalPoints));
+    
     $("aTotalPoints").textContent = fmt(totalPoints);
 
     const warns = [];
