@@ -15,16 +15,12 @@
     label { display: block; font-weight: 650; margin-bottom: 6px; }
     input, select { width: 100%; padding: 10px; border: 1px solid var(--bd); border-radius: 10px; font-size: 14px; background: white; }
     .muted { color:#666; font-size: 12px; }
-    .btnrow { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
-    button { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--bd); background: var(--bg); cursor: pointer; }
-    button.primary { background: #111; color: white; border-color:#111; }
     .result { margin-top: 12px; border-top: 1px dashed var(--bd); padding-top: 12px; }
     .kpi { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
     @media (max-width: 820px){ .kpi { grid-template-columns: 1fr; } }
     .k { border: 1px solid var(--bd); border-radius: 12px; padding: 12px; background: var(--bg); }
-    .k b { font-size: 16px; display:block; margin-top: 4px; }
+    .k b { font-size: 16px; display:block; margin-top: 4px; font-variant-numeric: tabular-nums; }
     .warn { color: var(--warn); font-weight: 800; }
-    .ok { color: var(--ok); font-weight: 800; }
     .hidden { display:none; }
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid var(--bd); padding: 8px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -32,6 +28,7 @@
     .foot { margin-top: 14px; font-size: 12px; color:#666; }
     .hr { height: 1px; background: var(--bd); margin: 14px 0; }
     .pill { display:inline-block; padding: 2px 8px; border:1px solid var(--bd); border-radius: 999px; font-size: 12px; background: var(--bg); }
+    button { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--bd); background: var(--bg); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -58,19 +55,20 @@
         <label>目的 <span class="pill">必須</span></label>
         <select id="mode">
           <option value="A">A：兵士をたくさん増やしたい（安全に突撃できる最大兵士数→内訳入力）</option>
-          <option value="B">B：ポイントから逆算したい（目標ポイント→必要突撃人数）</option>
+          <option value="B">B：ポイントから逆算したい（目標実ポイント→必要突撃人数）</option>
         </select>
       </div>
       <div id="targetWrap" class="hidden">
-        <label>③ ほしいポイント数（1000単位）<span class="pill">必須（Bのみ）</span></label>
-        <input id="targetPoints" type="number" min="0" step="1000" placeholder="例：50000" />
-        <div class="muted">1000刻みで入力してください（例：50000）</div>
+        <label>③ ほしい実ポイント<span class="pill">必須（Bのみ）</span></label>
+        <input id="targetPoints" type="number" min="0" step="1" placeholder="例：50525" />
+        <div class="muted">刻み制限なし（整数で入力）</div>
       </div>
     </div>
 
     <!-- A -->
     <div id="sectionA" class="result">
-      <h2>A：安全最大人数 → 兵士ランク内訳 → 合計ポイント</h2>
+      <h2>A：安全最大人数 → 兵士ランク内訳 → 合計ポイント（実ポイント）</h2>
+
       <div class="kpi">
         <div class="k">
           安全に突撃できる最大兵士数（推奨上限）
@@ -80,17 +78,16 @@
         <div class="k">
           入力した突撃人数 合計
           <b id="aTotalSoldiers">-</b>
-          <div class="muted">最大兵士数を超えると警告</div>
         </div>
         <div class="k">
-          合計ポイント（兵士ランクごと）
+          合計ポイント（実ポイント）
           <b id="aTotalPoints">-</b>
-          <div class="muted">④（下表）×人数 の合計</div>
+          <div class="muted">④（兵士ランクごとのポイント）×人数 の合計</div>
         </div>
       </div>
 
       <div style="margin-top:12px;" class="muted">
-        ※各ランクの突撃人数を入力してください（自動でポイント計算します）
+        ※各ランクの突撃人数を入力してください（自動で合計ポイントを計算します）
       </div>
 
       <div style="margin-top:8px; overflow:auto;">
@@ -98,9 +95,8 @@
           <thead>
             <tr>
               <th>兵士ランク</th>
-              <th>④ 1人あたりポイント</th>
               <th>突撃人数</th>
-              <th>ポイント小計</th>
+              <th>ポイント小計（実ポイント）</th>
             </tr>
           </thead>
           <tbody id="aTableBody"></tbody>
@@ -112,19 +108,18 @@
 
     <!-- B -->
     <div id="sectionB" class="result hidden">
-      <h2>B：目標ポイント → 必要“死亡数ポイント（=累計値）” → 必要突撃人数</h2>
+      <h2>B：目標実ポイント →（死亡数ポイント増分で埋める前提）メイン／サブの突撃人数</h2>
 
       <div class="row">
         <div>
-          <label>現在獲得しているポイントは？</label>
-          <select id="hasCurrentPoints">
-            <option value="no">ない（0）</option>
-            <option value="yes">ある（入力する）</option>
-          </select>
+          <label>現在獲得している実ポイント<span class="pill">必須</span></label>
+          <input id="currentRealPoints" type="number" min="0" step="1" placeholder="例：12000" />
+          <div class="muted">死亡数ポイント以外の入手分も全部含めた「現在の合計」</div>
         </div>
-        <div id="currentPointsWrap" class="hidden">
-          <label>現在獲得しているポイント</label>
-          <input id="currentPoints" type="number" min="0" step="1" placeholder="例：12000" />
+        <div>
+          <label>現在の死亡数ポイント（累計）<span class="pill">必須</span></label>
+          <input id="currentDeathPoints" type="number" min="0" step="1" placeholder="例：200000" />
+          <div class="muted">死亡数ポイントで今どこまで到達しているか（累計値）</div>
         </div>
       </div>
 
@@ -134,32 +129,36 @@
           <select id="mainRank"></select>
         </div>
         <div>
-          <label>計算</label>
-          <div class="btnrow">
-            <button class="primary" id="calcB">Bを計算する</button>
-            <button id="toggleIrregular" disabled>兵士が1種類では足りない場合</button>
+          <label>不足実ポイント（③−現在実ポイント）</label>
+          <div class="k" style="margin-top:6px;">
+            不足実ポイント
+            <b id="bNeedPoints">-</b>
+            <div class="muted">この不足分を「死亡数ポイント増分」で埋める前提で必要人数を逆算します</div>
           </div>
-          <div class="muted">※Bを先に計算してから、イレギュラーを押してください</div>
         </div>
       </div>
 
       <div class="kpi" style="margin-top:12px;">
         <div class="k">
-          目標までの不足ポイント（③−現在）
-          <b id="bNeedPoints">-</b>
+          結論：メイン突撃人数
+          <b id="bMainSoldiers">-</b>
         </div>
         <div class="k">
-          ⑤ 必要な死亡数ポイント（累計値）
-          <b id="bNeedDeathPoints">-</b>
-          <div class="muted">不足ポイントを達成する最小の累計値（下の到達表に基づく）</div>
+          結論：サブ突撃人数
+          <b id="bSubSoldiers">0</b>
+          <div class="muted">イレギュラー未使用の場合は0</div>
         </div>
         <div class="k">
-          必要突撃人数（メイン）
-          <b id="bNeedSoldiers">-</b>
+          合計突撃人数（メイン+サブ）
+          <b id="bTotalSoldiers">-</b>
         </div>
       </div>
 
       <div id="bWarn" class="warn" style="margin-top:10px;"></div>
+
+      <div class="hr"></div>
+
+      <button id="toggleIrregular" type="button">兵士が1種類では足りない場合（サブを使う）</button>
 
       <!-- Irregular -->
       <div id="irregularBox" class="card hidden" style="margin-top:14px;">
@@ -173,41 +172,32 @@
           <div>
             <label>⑥ メインで突撃させる兵士数（入力）</label>
             <input id="mainCountManual" type="number" min="0" step="1" placeholder="例：20000" />
-            <div class="muted">B計算で出た必要人数より少なめで入力する想定</div>
+            <div class="muted">入力すると自動でサブ必要人数を再計算します</div>
           </div>
-        </div>
-
-        <div class="btnrow">
-          <button class="primary" id="calcIrregular">サブ人数を算出</button>
         </div>
 
         <div class="kpi" style="margin-top:12px;">
           <div class="k">
-            サブ必要人数（算出）
+            結論：メイン突撃人数
+            <b id="iMainConclusion">-</b>
+          </div>
+          <div class="k">
+            結論：サブ突撃人数
+            <b id="iSubConclusion">-</b>
+          </div>
+          <div class="k">
+            参考：サブ必要人数（算出）
             <b id="iSubNeed">-</b>
-          </div>
-          <div class="k">
-            合計人数（メイン+サブ）
-            <b id="iTotal">-</b>
-          </div>
-          <div class="k">
-            使用する死亡数ポイント（累計値）
-            <b id="iNeedDeathPoints">-</b>
+            <div class="muted">同じ値（表示名だけ）</div>
           </div>
         </div>
 
         <div id="iWarn" class="warn" style="margin-top:10px;"></div>
 
         <div class="foot">
-          ※計算式（仕様に合わせた形）<br/>
-          必要累計値 －（メイン人数×メインの④）を、サブの④で割ってサブ人数を出します。<br/>
-          （※仕様文中の式の分母に「×⑥」がありますが、単位の整合性のためここでは「サブの④」で割る形にしています）
+          ※内部計算：不足実ポイント →「現在の死亡数ポイント」から到達増分で埋めるための必要人数を逆算します。<br/>
+          すでに到達している死亡数ポイント分は差し引かれます（=増分だけ必要）。
         </div>
-      </div>
-
-      <div class="foot" style="margin-top:12px;">
-        ⑤（死亡数ポイント→ポイントの到達表）は「累計死亡数ポイント」を積み上げて到達した分だけ加算されます（例：40000到達なら 100+150+200）。<br/>
-        100万を超えた分は、50万到達ごとに +200 として扱います。
       </div>
     </div>
 
@@ -222,7 +212,7 @@
 
 <script>
 (() => {
-  // ④ 兵士ランクごとのポイント
+  // ④ 兵士ランクごとのポイント（=死亡数ポイント増分を作るための換算値として使う）
   const RANK_POINTS = {
     "T6": 20,
     "T7": 25,
@@ -234,8 +224,8 @@
     "T13": 125,
   };
 
-  // ⑤ 到達表（累計死亡数ポイント → 加算ポイント）
-  // 「到達したら加算される」ので、累計値が閾値を超えた分だけ足す
+  // ⑤ 到達表（累計死亡数ポイント → 加算されるポイント）
+  // 「到達したら加算される」方式（例：40000到達なら 100+150+200）
   const MILESTONES = [
     { deathPoints: 10000, addPoints: 100 },
     { deathPoints: 20000, addPoints: 150 },
@@ -257,25 +247,28 @@
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
   }
-
   function fmt(n, digits=0) {
     if (!Number.isFinite(n)) return "-";
     return n.toLocaleString("ja-JP", { maximumFractionDigits: digits });
   }
-
   function ceil(n) {
     if (!Number.isFinite(n)) return NaN;
     return Math.ceil(n);
   }
 
-  // ①÷（0.7＋②×0.003）
-  function calcMaxSafe(hospitalCap, aftershockRatePercent) {
-    const denom = 0.7 + (aftershockRatePercent * 0.003);
-    if (denom <= 0) return NaN;
-    return hospitalCap / denom;
+  // 係数（0.7＋②×0.003）
+  function factorFromRate(aftershockRatePercent) {
+    return 0.7 + (aftershockRatePercent * 0.003);
   }
 
-  // 累計死亡数ポイント(deathPoints)から、獲得ポイントを計算（到達ごとに加算）
+  // Aの推奨上限：①÷（0.7＋②×0.003）
+  function calcMaxSafe(hospitalCap, aftershockRatePercent) {
+    const factor = factorFromRate(aftershockRatePercent);
+    if (!Number.isFinite(factor) || factor <= 0) return NaN;
+    return hospitalCap / factor;
+  }
+
+  // 累計死亡数ポイント(deathPoints)に対して、到達で加算されるポイント（=実ポイントではない / ただしBの死亡数分の増分計算に使う）
   function pointsFromDeathPoints(deathPoints) {
     let p = 0;
     for (const m of MILESTONES) {
@@ -289,23 +282,30 @@
     return p;
   }
 
-  // 不足ポイント(needPoints)を満たす最小の「必要累計死亡数ポイント」を探す（逆算）
-  // まず1,000,000までを探索→それ以上は50万ごとに200なので段階的に伸ばす
-  function minDeathPointsForNeedPoints(needPoints) {
-    if (needPoints <= 0) return 0;
+  // 「現在の死亡数ポイント」からスタートして、追加でneedPoints分のポイントを稼ぐために必要な最小の累計死亡数ポイントを返す
+  function minDeathPointsFromCurrentForAdditionalPoints(currentDeathPoints, needAdditionalPoints) {
+    if (needAdditionalPoints <= 0) return currentDeathPoints;
 
-    // 0～1,000,000は閾値候補を昇順で見れば足りる
-    const candidates = [0, ...MILESTONES.map(m => m.deathPoints)];
+    const base = Math.max(0, Math.floor(currentDeathPoints));
+    const basePoints = pointsFromDeathPoints(base);
+
+    // まず既知の閾値候補（ベースより上だけ見る）
+    const candidates = MILESTONES
+      .map(m => m.deathPoints)
+      .filter(dp => dp >= base)
+      .sort((a,b)=>a-b);
+
+    // ベース自体が閾値未満でも、pointsFromDeathPoints(base)は正しく算出済みなのでOK
     for (const dp of candidates) {
-      if (pointsFromDeathPoints(dp) >= needPoints) return dp;
+      const gain = pointsFromDeathPoints(dp) - basePoints;
+      if (gain >= needAdditionalPoints) return dp;
     }
 
-    // 1,000,000でも足りない → 50万ブロックを足していく
-    let dp = 1000000;
-    while (pointsFromDeathPoints(dp) < needPoints) {
+    // 100万以降：50万ごとに+200（閾値候補を段階的に伸ばす）
+    let dp = Math.max(base, 1000000);
+    while ((pointsFromDeathPoints(dp) - basePoints) < needAdditionalPoints) {
       dp += AFTER_1M_STEP;
-      // 安全のため無限ループ回避（通常あり得ないが）
-      if (dp > 50000000) break;
+      if (dp > 50000000) break; // 念のため
     }
     return dp;
   }
@@ -316,12 +316,12 @@
     for (const r of Object.keys(RANK_POINTS)) {
       const opt = document.createElement("option");
       opt.value = r;
-      opt.textContent = `${r}（${RANK_POINTS[r]}）`;
+      opt.textContent = `${r}`;
       sel.appendChild(opt);
     }
   }
 
-  // UI: Aのテーブル作成
+  // UI: Aのテーブル作成（1人あたりポイント列なし）
   function buildATable() {
     const body = $("aTableBody");
     body.innerHTML = "";
@@ -330,8 +330,10 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r}</td>
-        <td>${fmt(RANK_POINTS[r])}</td>
-        <td><input data-rank="${r}" class="aCount" type="number" min="0" step="1" placeholder="0" style="text-align:right;"></td>
+        <td>
+          <input data-rank="${r}" class="aCount" type="number" min="0" step="1"
+                 placeholder="0" style="text-align:right;">
+        </td>
         <td id="sub_${r}">0</td>
       `;
       body.appendChild(tr);
@@ -342,13 +344,18 @@
     });
   }
 
-  function commonInputsOK() {
-    const cap = num($("hospitalCap").value, NaN);
-    const rate = num($("aftershockRate").value, NaN);
-    return Number.isFinite(cap) && cap >= 0 && Number.isFinite(rate) && rate >= 0;
+  function updateMode() {
+    const mode = $("mode").value;
+    const isA = mode === "A";
+    $("sectionA").classList.toggle("hidden", !isA);
+    $("sectionB").classList.toggle("hidden", isA);
+    $("targetWrap").classList.toggle("hidden", isA);
+
+    updateA();
+    updateBAll();
   }
 
-  // A更新
+  // A更新（表示は実ポイント）
   function updateA() {
     const cap = num($("hospitalCap").value, NaN);
     const rate = num($("aftershockRate").value, NaN);
@@ -382,61 +389,73 @@
     $("aWarn").textContent = warn.join(" / ");
   }
 
-  // B表示更新（ボタン押下で計算）
-  let lastNeedDeathPoints = 0; // B計算の結果（累計値）
-  function calcB() {
+  // B：内部保持（表示はしない）
+  let lastNeedDeathDelta = 0;  // 追加で必要な「死亡数ポイント（増分）」= newDP - currentDP
+
+  function updateBCoreOrIrregular() {
     const cap = num($("hospitalCap").value, NaN);
+    const rate = num($("aftershockRate").value, NaN);
+    const factor = factorFromRate(rate);
+
     const target = num($("targetPoints").value, NaN);
+    const curReal = num($("currentRealPoints").value, NaN);
+    const curDeath = num($("currentDeathPoints").value, NaN);
 
-    if (!Number.isFinite(target) || target < 0) {
-      $("bWarn").textContent = "③ ほしいポイント数（1000単位）を入力してください。";
+    // 入力不足
+    if (!Number.isFinite(target) || target < 0 || !Number.isFinite(curReal) || curReal < 0 || !Number.isFinite(curDeath) || curDeath < 0) {
+      $("bNeedPoints").textContent = "-";
+      $("bMainSoldiers").textContent = "-";
+      $("bSubSoldiers").textContent = "0";
+      $("bTotalSoldiers").textContent = "-";
+      $("bWarn").textContent = "";
+      lastNeedDeathDelta = 0;
+      // イレギュラー欄もリセット
+      $("iMainConclusion").textContent = "-";
+      $("iSubConclusion").textContent = "-";
+      $("iSubNeed").textContent = "-";
+      $("iWarn").textContent = "";
       return;
     }
-    if (target % 1000 !== 0) {
-      $("bWarn").textContent = "③ は1000刻みで入力してください。";
-      return;
-    }
 
-    const hasCur = $("hasCurrentPoints").value === "yes";
-    const cur = hasCur ? num($("currentPoints").value, 0) : 0;
+    // 不足実ポイント（ここは“実ポイント”の世界）
+    const needRealPoints = Math.max(0, target - curReal);
+    $("bNeedPoints").textContent = fmt(needRealPoints);
 
-    const needPoints = Math.max(0, target - cur);
-    $("bNeedPoints").textContent = fmt(needPoints);
-
-    // 不足ポイント → 必要な累計死亡数ポイント（最小）
-    const needDeathPoints = minDeathPointsForNeedPoints(needPoints);
-    lastNeedDeathPoints = needDeathPoints;
-    $("bNeedDeathPoints").textContent = fmt(needDeathPoints);
+    // 不足実ポイントを「死亡数ポイント到達による加算」で埋めるための、必要な累計死亡数ポイントを逆算（現在死亡数ポイントからの増分で考える）
+    const newDeathPoints = minDeathPointsFromCurrentForAdditionalPoints(curDeath, needRealPoints);
+    const deltaDeathPoints = Math.max(0, newDeathPoints - Math.floor(curDeath));
+    lastNeedDeathDelta = deltaDeathPoints;
 
     const mainRank = $("mainRank").value;
-    const per = RANK_POINTS[mainRank];
+    const mainPer = RANK_POINTS[mainRank];
 
-    const needSoldiers = per > 0 ? Math.ceil(needDeathPoints / per) : NaN;
-    $("bNeedSoldiers").textContent = Number.isFinite(needSoldiers) ? fmt(needSoldiers) : "-";
+    const irregularOn = !$("irregularBox").classList.contains("hidden");
 
-    const warn = [];
-    const rate = num($("aftershockRate").value, NaN);
-    const factor = 0.7 + (rate * 0.003);
+    if (!irregularOn) {
+      // メインのみ
+      const mainNeed = mainPer > 0 ? Math.ceil(deltaDeathPoints / mainPer) : NaN;
 
-    if (
-     Number.isFinite(cap) &&
-      Number.isFinite(needSoldiers) &&
-      Number.isFinite(factor) &&
-      (needSoldiers * factor) > cap
-    ) {
-     warn.push("病院容量を超えます");
+      $("bMainSoldiers").textContent = Number.isFinite(mainNeed) ? fmt(mainNeed) : "-";
+      $("bSubSoldiers").textContent = "0";
+      $("bTotalSoldiers").textContent = Number.isFinite(mainNeed) ? fmt(mainNeed) : "-";
+
+      // 警告条件（指定）：人数×factor > 病院容量
+      const warn = [];
+      if (Number.isFinite(cap) && Number.isFinite(mainNeed) && Number.isFinite(factor) && (mainNeed * factor) > cap) {
+        warn.push("病院容量を超えます");
+      }
+      $("bWarn").textContent = warn.join(" / ");
+    } else {
+      // イレギュラーON → サブ計算
+      updateIrregular();
     }
-
-    $("bWarn").textContent = warn.join(" / ");
-
-    // イレギュラー解禁
-    $("toggleIrregular").disabled = false;
-    $("iNeedDeathPoints").textContent = fmt(lastNeedDeathPoints);
-    $("iWarn").textContent = "";
   }
 
-  function calcIrregular() {
+  function updateIrregular() {
     const cap = num($("hospitalCap").value, NaN);
+    const rate = num($("aftershockRate").value, NaN);
+    const factor = factorFromRate(rate);
+
     const mainRank = $("mainRank").value;
     const subRank = $("subRank").value;
 
@@ -445,46 +464,43 @@
 
     const mainCount = Math.max(0, Math.floor(num($("mainCountManual").value, NaN)));
     if (!Number.isFinite(mainCount)) {
+      $("iMainConclusion").textContent = "-";
+      $("iSubConclusion").textContent = "-";
+      $("iSubNeed").textContent = "-";
       $("iWarn").textContent = "⑥ メインで突撃させる兵士数を入力してください。";
+
+      $("bMainSoldiers").textContent = "-";
+      $("bSubSoldiers").textContent = "-";
+      $("bTotalSoldiers").textContent = "-";
+      $("bWarn").textContent = "";
       return;
     }
 
-    // 必要累計値（Bで求めた）から、メイン分を引いて残りをサブで埋める
-    const remainDeathPoints = Math.max(0, lastNeedDeathPoints - (mainCount * mainPer));
-    const subNeed = subPer > 0 ? Math.ceil(remainDeathPoints / subPer) : NaN;
-
+    // 残り死亡数ポイント増分をサブで埋める
+    const remain = Math.max(0, lastNeedDeathDelta - (mainCount * mainPer));
+    const subNeed = subPer > 0 ? Math.ceil(remain / subPer) : NaN;
     const total = Number.isFinite(subNeed) ? (mainCount + subNeed) : NaN;
 
+    $("iMainConclusion").textContent = fmt(mainCount);
+    $("iSubConclusion").textContent = Number.isFinite(subNeed) ? fmt(subNeed) : "-";
     $("iSubNeed").textContent = Number.isFinite(subNeed) ? fmt(subNeed) : "-";
-    $("iTotal").textContent = Number.isFinite(total) ? fmt(total) : "-";
-    $("iNeedDeathPoints").textContent = fmt(lastNeedDeathPoints);
 
+    // Bの結論に反映
+    $("bMainSoldiers").textContent = fmt(mainCount);
+    $("bSubSoldiers").textContent = Number.isFinite(subNeed) ? fmt(subNeed) : "-";
+    $("bTotalSoldiers").textContent = Number.isFinite(total) ? fmt(total) : "-";
+
+    // 警告条件（指定）：（合計人数）×factor > 病院容量
     const warn = [];
-    const rate = num($("aftershockRate").value, NaN);
-    const factor = 0.7 + (rate * 0.003);
-
-    if (
-      Number.isFinite(cap) &&
-      Number.isFinite(total) &&
-      Number.isFinite(factor) &&
-      (total * factor) > cap
-    ) {
+    if (Number.isFinite(cap) && Number.isFinite(total) && Number.isFinite(factor) && (total * factor) > cap) {
       warn.push("病院容量を超えます");
     }
-
+    $("iWarn").textContent = warn.join(" / ");
+    $("bWarn").textContent = warn.join(" / ");
   }
 
-  function updateMode() {
-    const mode = $("mode").value;
-    const isA = mode === "A";
-    $("sectionA").classList.toggle("hidden", !isA);
-    $("sectionB").classList.toggle("hidden", isA);
-    $("targetWrap").classList.toggle("hidden", isA);
-  }
-
-  function updateHasCurrent() {
-    const yes = $("hasCurrentPoints").value === "yes";
-    $("currentPointsWrap").classList.toggle("hidden", !yes);
+  function updateBAll() {
+    updateBCoreOrIrregular();
   }
 
   // 初期化
@@ -492,24 +508,34 @@
   fillRankSelect($("subRank"));
   buildATable();
   updateMode();
-  updateHasCurrent();
   updateA();
+  updateBAll();
 
-  // イベント
+  // 共通入力：即反映
+  $("hospitalCap").addEventListener("input", () => { updateA(); updateBAll(); });
+  $("aftershockRate").addEventListener("input", () => { updateA(); updateBAll(); });
+
+  // モード切替
   $("mode").addEventListener("change", updateMode);
-  $("hasCurrentPoints").addEventListener("change", updateHasCurrent);
 
-  // 共通入力が変わったらAは即更新（Bはボタン計算）
-  $("hospitalCap").addEventListener("input", () => { updateA(); });
-  $("aftershockRate").addEventListener("input", () => { updateA(); });
+  // B入力：即反映
+  $("targetPoints").addEventListener("input", updateBAll);
+  $("currentRealPoints").addEventListener("input", updateBAll);
+  $("currentDeathPoints").addEventListener("input", updateBAll);
+  $("mainRank").addEventListener("change", updateBAll);
+  $("subRank").addEventListener("change", () => { if (!$("irregularBox").classList.contains("hidden")) updateIrregular(); });
 
-  $("calcB").addEventListener("click", calcB);
-
+  // イレギュラーON/OFF
   $("toggleIrregular").addEventListener("click", () => {
     $("irregularBox").classList.toggle("hidden");
+    updateBAll();
   });
 
-  $("calcIrregular").addEventListener("click", calcIrregular);
+  // イレギュラー入力：即反映
+  $("mainCountManual").addEventListener("input", () => {
+    if (!$("irregularBox").classList.contains("hidden")) updateIrregular();
+  });
+
 })();
 </script>
 </body>
