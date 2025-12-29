@@ -211,6 +211,38 @@
       line-height: 1.55;
     }
     footer b{ color: rgba(255,255,255,.85); }
+
+    /* 各入力項目の区切り線 */
+    .grid > div {
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.18);
+    }
+
+    /* 最後の項目だけ線を消す */
+    .grid > div:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.22);
+    }
+
+    /* 一番最初の section は線なし */
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .results {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.25);
+    }    
   </style>
 </head>
 <body>
@@ -226,7 +258,7 @@
 
       <!-- Step 1 -->
       <div class="section" id="step1">
-        <div class="sectionTitle"><span class="step">1</span>基本情報</div>
+        <div class="sectionTitle"><span class="step">1</span>まず、基本情報を入力してください。</div>
 
         <div class="grid two">
           <div>
@@ -247,7 +279,7 @@
 
       <!-- Step 2 (only after step1 valid) -->
       <div class="section hidden" id="step2">
-        <div class="sectionTitle"><span class="step">2</span>目的を選ぶ</div>
+        <div class="sectionTitle"><span class="step">2</span>次に、目的を選んでください</div>
 
         <label>今回の荒野の王では、どちらを重視しますか？<span class="req">必須</span></label>
         <select id="mode">
