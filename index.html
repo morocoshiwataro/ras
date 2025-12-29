@@ -268,4 +268,515 @@
             <div class="name">安全に突撃できる最大兵士数（推奨上限）</div>
             <div class="value"><span id="aMaxSafe">-</span><span class="unit">人</span></div>
             <div class="mini">式：① ÷（0.7 + ②×0.003）</div>
-          </
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="hint">各ランクの突撃人数を入力してください（表の入力欄にもスクショ例を付けています）</div>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>兵士ランク</th>
+                <th>突撃人数</th>
+                <th>ポイント小計（実ポイント）</th>
+              </tr>
+            </thead>
+            <tbody id="aTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- A results moved UNDER the rank inputs -->
+        <div class="results">
+          <div class="kpi">
+            <div class="name">合計ポイント（実ポイント）</div>
+            <div class="value"><span id="aTotalPoints">-</span><span class="unit">pt</span></div>
+          </div>
+          <div class="kpi">
+            <div class="name">入力した突撃人数 合計</div>
+            <div class="value"><span id="aTotalSoldiers">-</span><span class="unit">人</span></div>
+          </div>
+        </div>
+
+        <div class="warnBar" id="aWarn"></div>
+      </div>
+
+      <!-- B -->
+      <div class="section hidden" id="sectionB">
+        <div class="sectionTitle"><span class="step">B</span>B：入力</div>
+
+        <!-- target: 1 row -->
+        <div class="grid">
+          <div>
+            <label>③ ほしい実ポイント（目標）<span class="req">必須</span></label>
+            <img class="shot" id="shot_target" alt="スクショ例（仮）" />
+            <input id="targetPoints" type="number" min="0" step="1" placeholder="例：50525" />
+          </div>
+        </div>
+
+        <!-- current real + current death: 1 row -->
+        <div class="grid two">
+          <div>
+            <label>現在獲得している実ポイント<span class="req">必須</span></label>
+            <img class="shot" id="shot_cur_real" alt="スクショ例（仮）" />
+            <input id="currentRealPoints" type="number" min="0" step="1" placeholder="例：12000" />
+          </div>
+          <div>
+            <label>現在の死亡数ポイント（累計）<span class="req">必須</span></label>
+            <img class="shot" id="shot_cur_death" alt="スクショ例（仮）" />
+            <input id="currentDeathPoints" type="number" min="0" step="1" placeholder="例：200000" />
+          </div>
+        </div>
+
+        <!-- main rank: 1 row -->
+        <div class="grid">
+          <div>
+            <label>メインで突撃させる兵士ランク<span class="req">必須</span></label>
+            <img class="shot" id="shot_main_rank" alt="スクショ例（仮）" />
+            <select id="mainRank"></select>
+          </div>
+        </div>
+
+        <!-- B results: BEFORE irregular (no sub) -->
+        <div class="results">
+          <div class="kpi">
+            <div class="name">不足実ポイント（目標−現在）</div>
+            <div class="value"><span id="bNeedPoints">-</span><span class="unit">pt</span></div>
+          </div>
+
+          <div class="kpi">
+            <div class="name">結論：メイン突撃人数</div>
+            <div class="value"><span id="bMainSoldiers">-</span><span class="unit">人</span></div>
+          </div>
+
+          <!-- sub result appears ONLY when irregular ON -->
+          <div class="kpi hidden" id="bSubCard">
+            <div class="name">結論：サブ突撃人数</div>
+            <div class="value"><span id="bSubSoldiers">-</span><span class="unit">人</span></div>
+          </div>
+        </div>
+
+        <div class="warnBar" id="bWarn"></div>
+
+        <button class="toggle" id="toggleIrregular" type="button">兵士が1種類では足りない場合（サブを使う）</button>
+
+        <div class="section hidden" id="irregularBox" style="margin-top: 10px;">
+          <div class="sectionTitle"><span class="step">＋</span>サブを使う場合</div>
+
+          <div class="grid two">
+            <div>
+              <label>サブで突撃させる兵士ランク<span class="req">必須</span></label>
+              <img class="shot" id="shot_sub_rank" alt="スクショ例（仮）" />
+              <select id="subRank"></select>
+            </div>
+            <div>
+              <label>⑥ メインで突撃させる兵士数（手入力）<span class="req">必須</span></label>
+              <img class="shot" id="shot_main_manual" alt="スクショ例（仮）" />
+              <input id="mainCountManual" type="number" min="0" step="1" placeholder="例：20000" />
+            </div>
+          </div>
+
+          <!-- After irregular ON: show ONLY one sub number (sub soldiers) -->
+          <div class="results">
+            <div class="kpi">
+              <div class="name">結論：メイン突撃人数</div>
+              <div class="value"><span id="iMainConclusion">-</span><span class="unit">人</span></div>
+            </div>
+            <div class="kpi">
+              <div class="name">結論：サブ突撃人数</div>
+              <div class="value"><span id="iSubConclusion">-</span><span class="unit">人</span></div>
+            </div>
+          </div>
+
+          <div class="warnBar" id="iWarn"></div>
+        </div>
+      </div>
+
+      <footer>
+        <b>利用条件</b><br/>
+        本ページは、閲覧者が個人的に計算を行う目的に限り利用できます。<br/>
+        本ページの計算内容・ロジック・数式・ソースコード等の転載は禁止での転載・流用・再配布・二次利用（別サイト/アプリ等への組み込みを含む）を禁止します。
+      </footer>
+
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ④ 兵士ランクごとのポイント（死亡数ポイント増分の換算）
+  const RANK_POINTS = {
+    "T6": 20, "T7": 25, "T8": 33, "T9": 45,
+    "T10": 60, "T11": 80, "T12": 100, "T13": 125,
+  };
+
+  // ⑤ 到達表（累計死亡数ポイント → 加算ポイント）
+  const MILESTONES = [
+    { deathPoints: 10000, addPoints: 100 },
+    { deathPoints: 20000, addPoints: 150 },
+    { deathPoints: 40000, addPoints: 200 },
+    { deathPoints: 100000, addPoints: 250 },
+    { deathPoints: 200000, addPoints: 300 },
+    { deathPoints: 300000, addPoints: 350 },
+    { deathPoints: 400000, addPoints: 400 },
+    { deathPoints: 600000, addPoints: 450 },
+    { deathPoints: 800000, addPoints: 500 },
+    { deathPoints: 1000000, addPoints: 600 },
+  ];
+  const AFTER_1M_STEP = 500000;
+  const AFTER_1M_ADD = 200;
+
+  const $ = (id) => document.getElementById(id);
+
+  function num(v, fallback = NaN) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+  function fmt(n) {
+    if (!Number.isFinite(n)) return "-";
+    return Math.round(n).toLocaleString("ja-JP");
+  }
+
+  // ==== placeholder screenshot generator (SVG data URI) ====
+  function svgShot(label){
+    const svg =
+`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#6f4a1c" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#c79a4b" stop-opacity=".55"/>
+    </linearGradient>
+    <pattern id="p" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.6" fill="#ffffff" opacity=".10"/>
+      <circle cx="12" cy="9" r="1.2" fill="#ffffff" opacity=".08"/>
+      <circle cx="7" cy="14" r="1.4" fill="#ffffff" opacity=".08"/>
+    </pattern>
+  </defs>
+  <rect x="0" y="0" width="1200" height="360" fill="#0b0906"/>
+  <rect x="0" y="0" width="1200" height="360" fill="url(#g)"/>
+  <rect x="0" y="0" width="1200" height="360" fill="url(#p)" opacity=".9"/>
+  <rect x="22" y="22" width="1156" height="316" rx="24" fill="rgba(0,0,0,.28)" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+  <text x="60" y="130" font-size="44" font-family="system-ui, -apple-system, Segoe UI, Noto Sans JP" fill="rgba(255,255,255,.92)" font-weight="800">スクショ例（仮）</text>
+  <text x="60" y="196" font-size="34" font-family="system-ui, -apple-system, Segoe UI, Noto Sans JP" fill="rgba(255,255,255,.80)" font-weight="700">${escapeXml(label)}</text>
+  <text x="60" y="258" font-size="24" font-family="system-ui, -apple-system, Segoe UI, Noto Sans JP" fill="rgba(255,255,255,.60)">ここにゲーム画面の該当部分を横長で貼る想定</text>
+</svg>`;
+    return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+  }
+  function escapeXml(s){
+    return String(s).replace(/[<>&"']/g, (c) => ({
+      "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;", "'":"&apos;"
+    }[c]));
+  }
+
+  // 係数（0.7＋②×0.003）
+  function factorFromRate(aftershockRatePercent) {
+    return 0.7 + (aftershockRatePercent * 0.003);
+  }
+
+  // Aの推奨上限：①÷（0.7＋②×0.003）
+  function calcMaxSafe(hospitalCap, aftershockRatePercent) {
+    const factor = factorFromRate(aftershockRatePercent);
+    if (!Number.isFinite(factor) || factor <= 0) return NaN;
+    return hospitalCap / factor;
+  }
+
+  // 累計死亡数ポイント→加算ポイント
+  function pointsFromDeathPoints(deathPoints) {
+    let p = 0;
+    for (const m of MILESTONES) {
+      if (deathPoints >= m.deathPoints) p += m.addPoints;
+    }
+    if (deathPoints > 1000000) {
+      const extra = deathPoints - 1000000;
+      const blocks = Math.floor(extra / AFTER_1M_STEP);
+      p += blocks * AFTER_1M_ADD;
+    }
+    return p;
+  }
+
+  // 現在死亡数ポイントから、追加でneedAdditionalPoints稼ぐのに必要な最小の累計死亡数ポイント
+  function minDeathPointsFromCurrentForAdditionalPoints(currentDeathPoints, needAdditionalPoints) {
+    if (needAdditionalPoints <= 0) return Math.floor(currentDeathPoints);
+
+    const base = Math.max(0, Math.floor(currentDeathPoints));
+    const basePoints = pointsFromDeathPoints(base);
+
+    const candidates = MILESTONES
+      .map(m => m.deathPoints)
+      .filter(dp => dp >= base)
+      .sort((a,b)=>a-b);
+
+    for (const dp of candidates) {
+      const gain = pointsFromDeathPoints(dp) - basePoints;
+      if (gain >= needAdditionalPoints) return dp;
+    }
+
+    let dp = Math.max(base, 1000000);
+    while ((pointsFromDeathPoints(dp) - basePoints) < needAdditionalPoints) {
+      dp += AFTER_1M_STEP;
+      if (dp > 50000000) break;
+    }
+    return dp;
+  }
+
+  function show(el, on){ el.classList.toggle("hidden", !on); }
+
+  function setWarn(id, text){
+    const el = $(id);
+    if (text && text.trim().length){
+      el.textContent = text;
+      el.classList.add("show");
+    } else {
+      el.textContent = "";
+      el.classList.remove("show");
+    }
+  }
+
+  // Populate rank selects
+  function fillRankSelect(sel) {
+    sel.innerHTML = `<option value="">選択してください</option>`;
+    for (const r of Object.keys(RANK_POINTS)) {
+      const opt = document.createElement("option");
+      opt.value = r;
+      opt.textContent = r;
+      sel.appendChild(opt);
+    }
+  }
+
+  // Build A table (with a small placeholder shot for each input row)
+  function buildATable() {
+    const body = $("aTableBody");
+    body.innerHTML = "";
+    for (const r of Object.keys(RANK_POINTS)) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r}<img class="shot sm" alt="スクショ例（仮）" src="${svgShot("A："+r+" の入力欄")}" /></td>
+        <td>
+          <input class="smallInput aCount" data-rank="${r}" type="number" min="0" step="1" placeholder="0" />
+        </td>
+        <td id="sub_${r}">0</td>
+      `;
+      body.appendChild(tr);
+    }
+    body.querySelectorAll(".aCount").forEach(inp => inp.addEventListener("input", updateA));
+  }
+
+  // Step gating
+  function step1Valid(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    return Number.isFinite(cap) && cap >= 0 && Number.isFinite(rate) && rate >= 0;
+  }
+
+  function updateStepVisibility(){
+    const ok1 = step1Valid();
+    show($("step2"), ok1);
+
+    const mode = $("mode").value;
+    show($("sectionA"), ok1 && mode === "A");
+    show($("sectionB"), ok1 && mode === "B");
+
+    if (!(ok1 && mode === "B")) {
+      show($("irregularBox"), false);
+      $("bSubCard").classList.add("hidden");
+    }
+  }
+
+  // A calc
+  function updateA(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    if (!Number.isFinite(cap) || !Number.isFinite(rate)) {
+      $("aMaxSafe").textContent = "-";
+      $("aTotalPoints").textContent = "-";
+      $("aTotalSoldiers").textContent = "-";
+      setWarn("aWarn", "");
+      return;
+    }
+
+    const maxSafe = Math.ceil(calcMaxSafe(cap, rate));
+    $("aMaxSafe").textContent = fmt(maxSafe);
+
+    let totalSoldiers = 0;
+    let totalPoints = 0;
+    document.querySelectorAll(".aCount").forEach(inp => {
+      const r = inp.dataset.rank;
+      const c = Math.max(0, Math.floor(num(inp.value, 0)));
+      totalSoldiers += c;
+      const sub = c * RANK_POINTS[r];
+      totalPoints += sub;
+      $("sub_" + r).textContent = fmt(sub);
+    });
+
+    $("aTotalSoldiers").textContent = fmt(totalSoldiers);
+    $("aTotalPoints").textContent = fmt(totalPoints);
+
+    const warns = [];
+    if (Number.isFinite(maxSafe) && totalSoldiers > maxSafe) {
+      warns.push(`推奨上限を超えています（${fmt(totalSoldiers)} > ${fmt(maxSafe)}）`);
+    }
+    if (Number.isFinite(cap) && totalSoldiers > cap) {
+      warns.push(`病院容量を超えています（${fmt(totalSoldiers)} > ${fmt(cap)}）`);
+    }
+    setWarn("aWarn", warns.join(" / "));
+  }
+
+  // B state
+  let lastNeedDeathDelta = 0;
+
+  function bInputsReady(){
+    const target = num($("targetPoints").value);
+    const curReal = num($("currentRealPoints").value);
+    const curDeath = num($("currentDeathPoints").value);
+    const mainRank = $("mainRank").value;
+    return Number.isFinite(target) && target >= 0 &&
+           Number.isFinite(curReal) && curReal >= 0 &&
+           Number.isFinite(curDeath) && curDeath >= 0 &&
+           mainRank;
+  }
+
+  function updateB(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    const factor = factorFromRate(rate);
+
+    if (!bInputsReady()){
+      $("bNeedPoints").textContent = "-";
+      $("bMainSoldiers").textContent = "-";
+      $("bSubSoldiers").textContent = "-";
+      $("bSubCard").classList.add("hidden");
+      setWarn("bWarn", "");
+      lastNeedDeathDelta = 0;
+      return;
+    }
+
+    const target = Math.floor(num($("targetPoints").value, 0));
+    const curReal = Math.floor(num($("currentRealPoints").value, 0));
+    const curDeath = Math.floor(num($("currentDeathPoints").value, 0));
+    const mainRank = $("mainRank").value;
+
+    const needRealPoints = Math.max(0, target - curReal);
+    $("bNeedPoints").textContent = fmt(needRealPoints);
+
+    const newDP = minDeathPointsFromCurrentForAdditionalPoints(curDeath, needRealPoints);
+    lastNeedDeathDelta = Math.max(0, newDP - curDeath);
+
+    const mainPer = RANK_POINTS[mainRank];
+    const mainNeed = mainPer > 0 ? Math.ceil(lastNeedDeathDelta / mainPer) : NaN;
+
+    const irregularOn = !$("irregularBox").classList.contains("hidden");
+    if (!irregularOn){
+      $("bMainSoldiers").textContent = fmt(mainNeed);
+      $("bSubCard").classList.add("hidden"); // ←サブは非表示
+      setWarn("bWarn",
+        (Number.isFinite(cap) && Number.isFinite(mainNeed) && Number.isFinite(factor) && (mainNeed * factor) > cap)
+          ? "病院容量を超えます"
+          : ""
+      );
+    } else {
+      updateIrregular();
+    }
+  }
+
+  function irregularInputsReady(){
+    return $("subRank").value && Number.isFinite(num($("mainCountManual").value));
+  }
+
+  function updateIrregular(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    const factor = factorFromRate(rate);
+
+    const mainRank = $("mainRank").value;
+    const subRank = $("subRank").value;
+    const mainPer = RANK_POINTS[mainRank];
+    const subPer = RANK_POINTS[subRank];
+
+    $("bSubCard").classList.remove("hidden"); // ←サブ表示ON
+
+    if (!irregularInputsReady()){
+      $("iMainConclusion").textContent = "-";
+      $("iSubConclusion").textContent = "-";
+      $("bSubSoldiers").textContent = "-";
+      setWarn("iWarn", "⑥ メイン兵士数 と サブランク を入力してください。");
+      setWarn("bWarn", "");
+      return;
+    }
+
+    const mainCount = Math.max(0, Math.floor(num($("mainCountManual").value, 0)));
+    const remain = Math.max(0, lastNeedDeathDelta - (mainCount * mainPer));
+    const subNeed = subPer > 0 ? Math.ceil(remain / subPer) : NaN;
+    const total = Number.isFinite(subNeed) ? (mainCount + subNeed) : NaN;
+
+    $("iMainConclusion").textContent = fmt(mainCount);
+    $("iSubConclusion").textContent = fmt(subNeed);
+
+    $("bMainSoldiers").textContent = fmt(mainCount);
+    $("bSubSoldiers").textContent = fmt(subNeed);
+
+    const warn = (Number.isFinite(cap) && Number.isFinite(total) && Number.isFinite(factor) && (total * factor) > cap)
+      ? "病院容量を超えます"
+      : "";
+    setWarn("iWarn", warn);
+    setWarn("bWarn", warn);
+  }
+
+  // Mode change
+  function onModeChange(){
+    updateStepVisibility();
+    updateA();
+    updateB();
+  }
+
+  // Toggle irregular
+  $("toggleIrregular").addEventListener("click", () => {
+    const box = $("irregularBox");
+    box.classList.toggle("hidden");
+    if (box.classList.contains("hidden")) {
+      $("bSubCard").classList.add("hidden");
+      setWarn("iWarn", "");
+      updateB();
+    } else {
+      updateB();
+      updateIrregular();
+    }
+  });
+
+  // Init screenshots
+  $("shot_hospital").src = svgShot("① 病院容量（深部容量）");
+  $("shot_aftershock").src = svgShot("② アフターショック率");
+  $("shot_mode").src = svgShot("A / B の目的選択");
+  $("shot_target").src = svgShot("③ ほしい実ポイント（目標）");
+  $("shot_cur_real").src = svgShot("現在獲得している実ポイント");
+  $("shot_cur_death").src = svgShot("現在の死亡数ポイント（累計）");
+  $("shot_main_rank").src = svgShot("メイン兵士ランク");
+  $("shot_sub_rank").src = svgShot("サブ兵士ランク");
+  $("shot_main_manual").src = svgShot("⑥ メイン突撃人数（手入力）");
+
+  // Init selects & table
+  fillRankSelect($("mainRank"));
+  fillRankSelect($("subRank"));
+  buildATable();
+
+  // Events
+  $("hospitalCap").addEventListener("input", () => { updateStepVisibility(); updateA(); updateB(); });
+  $("aftershockRate").addEventListener("input", () => { updateStepVisibility(); updateA(); updateB(); });
+  $("mode").addEventListener("change", onModeChange);
+
+  $("targetPoints").addEventListener("input", updateB);
+  $("currentRealPoints").addEventListener("input", updateB);
+  $("currentDeathPoints").addEventListener("input", updateB);
+  $("mainRank").addEventListener("change", () => { updateStepVisibility(); updateB(); });
+
+  $("subRank").addEventListener("change", () => { if (!$("irregularBox").classList.contains("hidden")) updateIrregular(); });
+  $("mainCountManual").addEventListener("input", () => { if (!$("irregularBox").classList.contains("hidden")) updateIrregular(); });
+
+  // Initial state (force correct hidden)
+  updateStepVisibility();
+  updateA();
+  updateB();
+})();
+</script>
+</body>
+</html>
