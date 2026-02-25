@@ -1,0 +1,720 @@
+:root{
+      --bg: #0f0c07;
+      --card: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.64);
+      --accent: #c79a4b;
+      --warn: #ff4d4d;
+      --shadow: 0 10px 24px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(199,154,75,.22), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(122,79,29,.20), transparent 65%),
+        linear-gradient(180deg, #120f0a 0%, #0b0906 100%);
+      min-height:100dvh;
+    }
+    .wrap{ max-width: 900px; margin: 0 auto; padding: 18px 14px 30px; }
+
+    header{ margin-bottom: 14px; }
+    h1{
+      margin:0;
+      font-size: 22px; /* ←少し大きめ */
+      letter-spacing: .02em;
+      line-height: 1.2;
+    }
+    .sub{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.04) 100%);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .section{ margin-top: 12px; }
+    .sectionTitle{
+      display:flex; align-items:center; gap:10px;
+      margin: 2px 0 10px;
+      font-size: 14px; font-weight: 900;
+    }
+    .step{
+      width: 24px; height: 24px;
+      display:inline-grid; place-items:center;
+      border-radius: 8px;
+      background: rgba(199,154,75,.18);
+      border: 1px solid rgba(199,154,75,.28);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 12px;
+      flex: 0 0 auto;
+    }
+
+    label{
+      display:block;
+      font-size: 13px;
+      font-weight: 800;
+      margin: 10px 0 6px;
+    }
+    .req{
+      display:inline-block;
+      margin-left: 6px;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(199,154,75,.35);
+      color: var(--accent);
+      background: rgba(199,154,75,.10);
+      vertical-align: middle;
+    }
+
+    /* placeholder screenshot */
+    .shot{
+      width: 100%;
+      height: auto;          /* 高さ固定をやめる */
+      max-height: 240px;     /* 必要なら上限 */
+      object-fit: contain;   /* 全体を表示 */
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      display:block;
+      margin: 8px 0 8px;
+    }
+    .shot.sm{
+      height: 40px;
+      border-radius: 10px;
+      margin: 6px 0;
+    }
+
+    input, select{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,.85);
+      background: rgba(0,0,0,.35);
+      color: var(--text);
+      outline: none;
+      font-size: 16px;
+    }
+    input::placeholder{ color: rgba(255,255,255,.35); }
+    input:focus, select:focus{
+      border-color: rgba(199,154,75,.55);
+      box-shadow: 0 0 0 3px rgba(199,154,75,.16);
+    }
+
+    .hint{ margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .grid{ display:grid; gap: 10px; grid-template-columns: 1fr; }
+    @media (min-width: 720px){
+      .grid.two{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .divider{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
+    .hidden{ display:none; }
+
+    /* Results */
+    .results{ margin-top: 12px; display:grid; gap: 10px; }
+    .kpi{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      padding: 12px;
+    }
+    .kpi .name{ font-size: 12px; color: var(--muted); }
+    .kpi .value{
+      margin-top: 6px;
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: .02em;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+    }
+    .kpi .unit{ font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 800; }
+    .kpi .mini{ margin-top: 6px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+    .warnBar{
+      margin-top: 10px;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      border: 1px solid rgba(255,77,77,.35);
+      background: rgba(255,77,77,.12);
+      color: #ffd7d7;
+      font-weight: 950;
+      display:none;
+    }
+    .warnBar.show{ display:block; }
+
+    /* Table (A breakdown) */
+    .tableWrap{
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: rgba(0,0,0,.18);
+    }
+    table{ width:100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    th, td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: right;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    th:first-child, td:first-child{ text-align:left; }
+    th{
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,.04);
+    }
+    tr:last-child td{ border-bottom: none; }
+
+    /* A：合計（筆算っぽく表示） */
+    .sumBox{
+      padding: 10px 10px 12px;
+    }
+    .sumBox .bar{
+      height: 1px;
+      background: rgba(255,255,255,.22);
+      margin: 6px 0 8px;
+    }
+    .sumBox .sumLine{
+      display:flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .sumBox .label{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sumBox .num{
+      font-size: 16px;
+      font-weight: 950;
+      color: rgba(255,255,255,.92);
+    }
+    .sumBox .unit{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .smallInput{
+      padding: 10px 10px;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+
+    .toggle{
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(199,154,75,.30);
+      background: rgba(199,154,75,.12);
+      color: #ffe7be;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    footer{
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    footer b{ color: rgba(255,255,255,.85); }
+
+    /* 各入力項目の区切り線 */
+    .grid > div {
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.18);
+    }
+
+    /* 最後の項目だけ線を消す */
+    .grid > div:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.22);
+    }
+
+    /* 一番最初の section は線なし */
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .results {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.25);
+    }    
+  
+    /* ===== Tabs (full width 2 tabs) ===== */
+    .tabBar{
+      display:flex;
+      gap:0;
+      margin: 12px 0 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(255,255,255,.04);
+    }
+    .tabBtn{
+      flex:1;
+      padding: 12px 10px;
+      background: transparent;
+      border: 0;
+      color: rgba(255,255,255,.70);
+      font-weight: 950;
+      cursor: pointer;
+      position: relative;
+    }
+    .tabBtn + .tabBtn{
+      border-left: 1px solid rgba(255,255,255,.10);
+    }
+    .tabBtn.isActive{
+      color: rgba(255,255,255,.95);
+      background: rgba(199,154,75,.14);
+    }
+    .tabBtn.isActive::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:4px;
+      background: rgba(199,154,75,.85);
+    }
+    .tabPanel{ margin-top: 12px; }
+    .tabPanel.hidden{ display:none !important; }
+
+    /* ===== Info mark (used instead of 必須) ===== */
+    .infoMark{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 18px;
+      height: 18px;
+      margin-left: 6px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 950;
+      vertical-align: middle;
+      cursor: help;
+      position: relative;
+      color: #0f0c07;
+      background: rgba(199,154,75,.92);
+      box-shadow: 0 0 0 2px rgba(199,154,75,.18);
+    }
+    .infoMark:hover{ filter: brightness(1.05); }
+
+    .infoMark::after{
+      content: attr(data-info);
+      position: absolute;
+      bottom: 135%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: rgba(0,0,0,.85);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .12s ease;
+      z-index: 20;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .infoMark::before{
+      content:"";
+      position:absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: rgba(0,0,0,.85) transparent transparent transparent;
+      opacity: 0;
+      transition: opacity .12s ease;
+      z-index: 20;
+    }
+    .infoMark:hover::after,
+    .infoMark:hover::before{
+      opacity: 1;
+    }
+
+    /* small action button */
+    .actionBtn{
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(199,154,75,.30);
+      background: rgba(255,255,255,.06);
+      color: #ffe7be;
+      font-weight: 950;
+      cursor: pointer;
+    }
+    .actionBtn:hover{ background: rgba(199,154,75,.12); }
+
+    .warn-num{font-size:1.35em;font-weight:900;line-height:1;display:inline-block;padding:0 .15em;}
+
+    /* ===== Train block layout tweaks ===== */
+    .grid.three{ display:grid; grid-template-columns: 1fr 1fr 180px; gap: 14px; }
+    .allocLabel{ display:flex; align-items:center; gap:8px; }
+    .ugLine{ display:flex; align-items:center; gap:12px; margin-top:10px; flex-wrap:wrap; }
+    .ugToggle{ display:flex; align-items:center; gap:8px; font-weight:850; }
+    .ugSelect{ display:flex; align-items:center; gap:8px; }
+    .ugSelect select{ min-width: 120px; }
+
+.trainBlock{ margin-top:14px; padding:14px; border:1px solid rgba(255,255,255,.10); border-radius:14px; background: rgba(0,0,0,.12); }
+    .trainHead{ font-weight:900; margin-bottom:10px; }
+    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px; align-items:end; }
+    .row3 .field .label{ font-size:12px; color: rgba(255,255,255,.75); margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+    .ugRow{ display:flex; align-items:center; gap:14px; margin-top:10px; flex-wrap:wrap; }
+    .checkLine{ display:flex; align-items:center; gap:8px; }
+    .ugPick{ display:flex; align-items:center; gap:8px; }
+/* ===== Upgrade row ===== */
+    .ugBox{
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.12);
+      padding:10px 12px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+    .ugCheck{ display:flex; align-items:center; gap:10px; font-weight:900; }
+    .ugCheck span{ white-space:nowrap; }
+    .ugPick{ display:flex; align-items:center; gap:10px; }
+    .ugLabel{ font-weight:900; white-space:nowrap; opacity:.9; }
+
+    /* ===== Radio (override global input styles) ===== */
+    .radioRow{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+    label.radio{ display:flex; align-items:center; gap:10px; margin:0; font-size:14px; font-weight:850; }
+    label.radio input[type="radio"]{
+      width:auto; padding:0; border:0; background:transparent;
+      appearance:auto; -webkit-appearance:radio;
+      transform: scale(1.05);
+      flex:0 0 auto;
+    }
+
+/* ===== Article / Blog parts (shared) ===== */
+
+.content{
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(255,255,255,.88);
+}
+.content p{ margin: 0 0 12px; }
+.content ul{ margin: 0 0 12px 1.2em; }
+.content li{ margin: 0 0 6px; }
+
+.emph{
+  font-weight: 950;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
+.headingBig{
+  margin: 18px 0 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: .02em;
+  background: rgba(199,154,75,.16);
+  border: 1px solid rgba(199,154,75,.28);
+  color: rgba(255,255,255,.95);
+}
+
+.headingSmall{
+  margin: 14px 0 8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size: 14px;
+  font-weight: 950;
+  color: rgba(255,255,255,.92);
+}
+.headingSmall .icon{
+  width: 22px; height: 22px;
+  display:inline-grid; place-items:center;
+  border-radius: 8px;
+  background: rgba(199,154,75,.18);
+  border: 1px solid rgba(199,154,75,.28);
+  color: var(--accent, #c79a4b);
+  font-weight: 950;
+  flex: 0 0 auto;
+}
+
+.notice{
+  margin: 14px 0;
+  padding: 12px 12px;
+  border-radius: var(--radius, 16px);
+  border: 1px solid rgba(255,77,77,.35);
+  background: rgba(255,77,77,.12);
+}
+.noticeTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 950;
+  margin: 0 0 8px;
+  color: #ffd7d7;
+}
+.noticeTitle .tri{
+  width: 18px; height: 18px;
+  flex: 0 0 auto;
+  display:block;
+}
+.noticeBody{
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.90);
+}
+
+.summary{
+  margin: 14px 0 0;
+  padding: 12px 12px;
+  border-radius: var(--radius, 16px);
+  border: 1px solid rgba(255,255,255,.18);
+  background: transparent;
+}
+.summaryTitle{
+  margin: 0 0 8px;
+  font-weight: 950;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.summaryTitle .badge{
+  width: 22px; height: 22px;
+  display:inline-grid; place-items:center;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  font-size: 12px;
+  font-weight: 950;
+  color: rgba(255,255,255,.90);
+  flex: 0 0 auto;
+}
+.summaryBody{
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.88);
+}
+
+.article + .article{
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.22);
+}
+
+/* Home cards */
+.grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 720px){
+  .grid{ grid-template-columns: 1fr 1fr; }
+}
+.linkCard{
+  display:block;
+  text-decoration:none;
+  color: inherit;
+  padding: 12px;
+  border-radius: var(--radius, 16px);
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.03);
+}
+.linkCard:hover{
+  border-color: rgba(199,154,75,.35);
+  background: rgba(255,255,255,.05);
+}
+
+/* linkCard bg support */
+.linkCard{
+  position: relative;
+  overflow: hidden;
+  background-image: var(--bgimg, none);
+  background-size: cover;
+  background-position: center;
+}
+.linkCard::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(15,12,7,.22) 0%, rgba(15,12,7,.80) 72%);
+  pointer-events:none;
+}
+.linkCard > *{
+  position: relative;
+  z-index: 1;
+}
+
+.linkTitle{
+  font-weight: 950;
+  margin: 0 0 6px;
+}
+.linkDesc{
+  margin: 0;
+  color: rgba(255,255,255,.70);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ===== Site header (click title to home) ===== */
+/* Full-bleed + sticky header that works on PC/mobile */
+.siteHeader{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100vw;
+  /* expand to viewport edges even inside a centered .wrap */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+
+  margin-top: 0;
+  margin-bottom: 14px;
+
+  padding: calc(12px + env(safe-area-inset-top)) 0 12px;
+  background: rgba(0,0,0,.78);          /* near-black, not pure */
+  border-bottom: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+}
+
+.siteHeader a{
+  display: block;
+  text-decoration: none;
+  color: rgba(255,255,255,.96);
+  font-weight: 950;
+  font-size: 22px;
+  letter-spacing: .02em;
+  line-height: 1.2;
+
+  /* keep text aligned to content column */
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 6px 14px;
+}
+
+.siteHeader a:hover{
+  color: rgba(255,255,255,.99);
+}
+
+@media (max-width: 420px){
+  .siteHeader a{
+    font-size: 20px;
+    padding: 6px 10px;
+  }
+}
+  .siteHeader a{
+    font-size: 20px;
+    padding: 6px 10px;
+  }
+}
+
+
+
+
+/* Reduce top gap above full-bleed header */
+.wrap{
+  padding-top: 0;
+}
+
+/* ===== Today event banner ===== */
+.todayBanner{
+  margin: 10px 0 14px;
+  padding: 12px 12px;
+  border-radius: var(--radius, 16px);
+  border: 1px solid rgba(255, 120, 120, .22);
+  background: rgba(255, 90, 90, .14); /* red-ish, not pure red */
+  box-shadow: 0 10px 22px rgba(0,0,0,.22);
+}
+.todayBannerTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 950;
+  color: rgba(255,255,255,.94);
+  margin: 0 0 6px;
+}
+.todayBannerBody{
+  color: rgba(255,255,255,.86);
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+.todayBannerHint{
+  color: rgba(255,255,255,.65);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 6px 0 0;
+}
+
+
+/* ===== Today banner tags (pill) ===== */
+.todayBannerTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.todayTags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.todayTag{
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.86);
+}
+
+
+/* ===== Section divider ===== */
+.sectionDivider{
+  height: 1px;
+  background: rgba(255,255,255,.16);
+  margin: 16px 0;
+  border-radius: 999px;
+}
+
+
+/* ===== Remove card container appearance ===== */
+.card{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}

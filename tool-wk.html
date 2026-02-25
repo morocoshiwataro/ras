@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>荒野の王：計算ツール</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>荒野の王 兵士数・ポイント計算ツール</h1>
+      <div class="sub">
+        隔週であるイベント「荒野の王」の計算補助ツールです。</br>
+        砲台を攻撃する兵士の数を計算する「攻撃する兵士数の計算」と、
+        その後の訓練に必要な資源・ブースト等が計算できる「資源・ブースト計算」ができます。</br>
+        </br>
+        お気づきの点や不具合報告、ご意見・ご要望は気軽にmorocoshiwataroまで！</br>
+        ※入力は上から順にお願いします。
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="サイト内ナビ">
+      <a href="home.html">ホーム</a>
+      <a href="events/wk.html">荒野の王（説明）</a>
+    </nav>
+
+
+    <div class="card">
+      <div class="tabBar" role="tablist" aria-label="計算タブ">
+        <button class="tabBtn isActive" id="tabSoldier" type="button" aria-selected="true">攻撃する兵士数の計算</button>
+        <button class="tabBtn" id="tabBoost" type="button" aria-selected="false">資源・ブースト計算（おまけ）</button>
+      </div>
+
+      <div class="tabPanel" id="panelSoldier">
+
+
+      <!-- Step 1 -->
+      <div class="section" id="step1">
+        <div class="sectionTitle"><span class="step">1</span>まず、基本情報を入力してください。</div>
+
+        <div class="grid two">
+          <div>
+            <label>病院容量（※現在の深部治療センターの空き）<span class="infoMark" data-info="避難所＞病院＞治療">i</span></label>
+            <img class="shot" src="images/01.png" alt="病院容量の確認画面" />
+                      <input id="hospitalCap" type="number" min="0" step="1" placeholder="例：172350" />
+            <div class="hint">単位：人</div>
+          </div>
+
+          <div>
+            <label>② アフターショック率（%）<span class="infoMark" data-info="指揮官情報（顔アイコン）＞強化情報＞部隊強化">i</span></label>
+            <img class="shot" src="images/02.png" alt="アフターショック率の確認画面" />
+            <input id="aftershockRate" type="number" min="0" step="0.01" placeholder="例：14" />
+            <div class="hint">入力は「%の数値」（11.5% → 11.5）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 (only after step1 valid) -->
+      <div class="section hidden" id="step2">
+        <div class="sectionTitle"><span class="step">2</span>次に、目的を選んでください</div>
+
+        <label>今回の荒野の王では、どちらを重視しますか？</label>
+        <select id="mode">
+          <option value="">選択してください</option>
+          <option value="A">兵士を増やす！（なるべく多くの戦後回復ブーストを獲得する）</option>
+          <option value="B">ポイント重視！（目標ポイントに必要な分だけ兵を殺す）</option>
+        </select>
+      </div>
+
+      <!-- A -->
+      <div class="section hidden" id="sectionA">
+        <div class="sectionTitle"><span class="step">A</span>兵士を増やす！（なるべく多くの戦後回復ブーストを獲得する）</div>
+
+        <!-- keep safety limit near the top -->
+        <div class="results" style="margin-top: 6px;">
+          <div class="kpi">
+            <div class="name">突撃できる最大兵士数（推奨上限）</div>
+            <div class="value"><span id="aMaxSafe">-</span><span class="unit">人</span></div>
+            <div class="mini">これ以上で突撃すると、深部治療センターに収まらずギルド病院に入ります。（要ギルドコイン）</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="hint">以下に各兵士ランクの突撃人数を入力すると、獲得できるポイントがわかります。</div>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>兵士ランク</th>
+                <th>突撃人数</th>
+                <th>ポイント小計（死亡数ポイント）</th>
+              </tr>
+            </thead>
+            <tbody id="aTableBody"></tbody>
+          </table>
+          <!-- 合計（筆算っぽく）: 右下に表示 -->
+          <div class="sumBox">
+            <div class="bar"></div>
+            <div class="sumLine">
+              <span class="label">合計（死亡数ポイント）</span>
+              <span class="num" id="aTotalPointsInline">-</span>
+              <span class="unit">ポイント</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- A results moved UNDER the rank inputs -->
+        <div class="results">
+          <div class="kpi">
+            <div class="name">死亡数ポイントで獲得できる実ポイント（目安）</div>
+            <div class="value"><span id="aDeathBonusRealPoints">-</span><span class="unit">ポイント</span></div>
+          </div>
+          <div class="kpi">
+            <div class="name">入力した突撃人数の合計</div>
+            <div class="value"><span id="aTotalSoldiers">-</span><span class="unit">人</span></div>
+          </div>
+        </div>
+
+        <div class="warnBar" id="aWarn"></div>
+        <button class="actionBtn" id="toBoostFromA" type="button">この人数の場合に、その後の訓練で必要なブースト・資源数を計算する</button>
+      </div>
+
+      <!-- B -->
+      <div class="section hidden" id="sectionB">
+        <div class="sectionTitle"><span class="step">B</span>ポイント重視！（目標ポイントに必要な分だけ兵を殺す）</div>
+
+        <!-- target: 1 row -->
+        <div class="grid">
+          <div>
+            <label>目標ポイント（ほしいポイント数）<span class="infoMark" data-info="これから攻撃することで獲得したいポイントのことです">i</span></label>
+            <input id="targetPoints" type="number" min="0" step="1" placeholder="例：5000" />
+          </div>
+        </div>
+
+        <!-- current real + current death: 1 row -->
+        <div class="grid two">
+          <div>
+            <label>現在獲得しているポイント<span class="infoMark" data-info="イベントセンター＞荒野の王＞個人報酬の右やや上">i</span></label>
+            <img class="shot" src="images/03.png" alt="現在獲得しているポイントの確認画面" />
+            <input id="currentRealPoints" type="number" min="0" step="1" placeholder="例：2000" />
+            <div class="hint">まだポイントを獲得していない場合、0と入れてください</div>
+          </div>
+          <div>
+            <label>現在の死亡数ポイント<span class="infoMark" data-info="イベントセンター＞荒野の王＞個人報酬の下部赤字部分">i</span></label>
+            <img class="shot" src="images/04.png" alt="現在の死亡数ポイントの確認画面" />
+            <input id="currentDeathPoints" type="number" min="0" step="1" placeholder="例：200000" />
+            <div class="hint">まだポイントを獲得していない場合、0と入れてください</div>
+          </div>
+        </div>
+
+        <!-- main rank: 1 row -->
+        <div class="grid">
+          <div>
+            <label>砲台を攻撃する兵士のランク<span class="infoMark" data-info="ランク混合で攻撃する場合は「サブを使う」から追加してください">i</span></label>
+            <select id="mainRank"></select>
+            <button class="toggle" id="toggleIrregular" type="button">兵士が1種類では足りない場合（サブを使う）</button>
+          </div>
+        </div>
+
+        <!-- B results: BEFORE irregular (no sub) -->
+        <div class="results">
+          <div class="kpi">
+            <div class="name">不足ポイント（目標−現在）</div>
+            <div class="value"><span id="bNeedPoints">-</span><span class="unit">ポイント</span></div>
+          </div>
+
+          <div class="kpi">
+            <div class="name">砲台攻撃の合計人数</div>
+            <div class="value"><span id="bMainSoldiers">-</span><span class="unit">人</span></div>
+          </div>
+
+          <!-- sub result appears ONLY when irregular ON -->
+          <div class="kpi hidden" id="bSubCard">
+            <div class="name">サブ突撃人数</div>
+            <div class="value"><span id="bSubSoldiers">-</span><span class="unit">人</span></div>
+            <div class="mini">1種類の兵士ランクでは不足する際、追加で突撃させるランクの兵士数</div>
+          </div>
+        </div>
+
+        <div class="warnBar" id="bWarn"></div>
+        <button class="actionBtn" id="toBoostFromB" type="button">ブースト計算へ反映して移動</button>
+
+        <div class="section hidden" id="irregularBox" style="margin-top: 10px;">
+          <div class="sectionTitle"><span class="step">＋</span>サブを使う場合</div>
+
+          <div class="grid two">
+            <div>
+              <label>サブで突撃させる兵士ランク</label>
+              <select id="subRank"></select>
+            </div>
+            <div>
+              <label>メインで突撃させる兵士数（手入力）</label>
+              <input id="mainCountManual" type="number" min="0" step="1" placeholder="例：20000" />
+            </div>
+          </div>
+
+          <!-- After irregular ON: show ONLY one sub number (sub soldiers) -->
+          <div class="results">
+            <div class="kpi">
+              <div class="name">メインで突撃する人数</div>
+              <div class="value"><span id="iMainConclusion">-</span><span class="unit">人</span></div>
+            </div>
+            <div class="kpi">
+              <div class="name">サブで突撃する人数</div>
+              <div class="value"><span id="iSubConclusion">-</span><span class="unit">人</span></div>
+            </div>
+          </div>
+
+          <div class="warnBar" id="iWarn"></div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <b>利用条件</b><br/>
+      本ページは、閲覧者が個人的に計算を行う目的に限り利用できます。<br/>
+      また、作者morocoshiwataroに許可なく本URLを外部に渡すことを禁止します。その場合、本ページを閉鎖する可能性があります。<br/>
+      本ページの計算内容・ロジック・数式・ソースコード等の転載は禁止での転載・流用・再配布・二次利用（別サイト/アプリ等への組み込みを含む）を禁止します。
+    </footer>
+      </div><!-- /panelSoldier -->
+
+      <div class="tabPanel hidden" id="panelBoost">
+        <div class="section">
+          <div class="sectionTitle"><span class="step">1</span>まず、訓練環境の情報を入力してください。</div>
+          <div class="grid two">
+            <div>
+              <label>訓練速度（%）<span class="infoMark" data-info="指揮官情報（顔アイコン）＞強化情報＞戦闘準備強化">i</span></label>
+              <img class="shot" src="images/05.png" alt="訓練速度の確認画面" />
+              <input id="trainSpeed" type="number" min="0" step="0.01" value="0" />
+            </div>
+            <div>
+              <label>訓練コストダウン（%）<span class="infoMark" data-info="英雄＞マリオス＞軍団スキル">i</span></label>
+              <img class="shot" src="images/06.png" alt="訓練コストダウンの確認画面" />
+              <input id="trainCostDown" type="number" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sectionTitle"><span class="step">2</span>戦後回復ブーストの入力or計算</div>
+
+          <div class="radioRow" style="margin-top:10px;">
+            <label class="radio"><input type="radio" name="boostInputMode" id="boostModeManual" value="manual">戦後回復ブーストを入力する【※終了後限定】</label>
+            <label class="radio"><input type="radio" name="boostInputMode" id="boostModeCharge" value="charge" checked>突撃する兵士の情報から算出する</label>
+          </div>
+
+          <div id="manualModeFields" class="section hidden" style="margin-top:10px;">
+            <div class="grid">
+              <div>
+                <label>戦後回復ブースト（ポイント）<span class="infoMark" data-info="イベントセンター＞荒野の王＞個人報酬＞下部真ん中のiマーク＞一番下の数字">i</span></label>
+                <input id="deathBoostManual" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+          </div>
+
+          <div id="chargeModeFields">
+          <div id="charge1" class="grid two">
+            <div>
+              <label>攻撃兵士のティア</label>
+              <select id="chargeTier1"></select>
+            </div>
+            <div>
+              <label>攻撃兵士の人数</label>
+              <input id="chargeNum1" type="number" min="0" step="1" value="0" />
+            </div>
+            <div class="sub">「＋サブ追加」を押すと、サブで攻撃した兵の入力欄が出ます。</div>
+          </div>
+
+          <div id="charge2Wrap" class="section hidden" style="margin-top:10px;">
+            <div class="grid two">
+              <div>
+                <label>サブ攻撃兵士のティア</label>
+                <select id="chargeTier2"></select>
+              </div>
+              <div>
+                <label>サブ攻撃兵士の人数</label>
+                <input id="chargeNum2" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <button class="toggle" id="removeCharge2" type="button" style="margin-top:10px;">サブ攻撃兵士の項目を削除</button>
+          </div>
+
+          <button class="toggle" id="addCharge2" type="button">＋サブ追加</button>
+
+          </div><!-- /chargeModeFields -->
+
+          <div class="warnBar" id="boostFromChargeInfo" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="section">
+          <div class="sectionTitle"><span class="step">3</span>新たに訓練する兵士の情報（最大4種類）</div>
+          <div class="sub">「＋追加する」から種類を増やせます。</div>
+
+          <div id="trainBlocks"></div>
+
+          <button class="toggle" id="addTrainBlock" type="button">＋追加する</button>
+          <button class="actionBtn" id="equalAlloc" type="button">入力した訓練兵士を均等に作る<span class="infoMark" data-info="バフで作れる分の兵士を均等に割ります">i</span></button>
+        </div>
+
+        <div class="section">
+          <div class="sectionTitle"><span class="step">4</span>結果</div>
+          <div class="results" style="margin-top:10px;">
+            <div class="kpi">
+              <div class="name">必要なブースト（合計）</div>
+              <div class="value"><span id="outNeedBoost">-</span></div>
+            </div>
+            <div class="kpi">
+              <div class="name">算出される戦後回復ブーストの値（ポイント）</div>
+              <div class="value"><span id="outDeathBoost">-</span><span class="unit">ポイント</span></div>
+            </div>
+          </div>
+
+          <div class="tableWrap" style="margin-top:10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>訓練兵</th>
+                  <th>配分%</th>
+                  <th>訓練人数</th>
+                </tr>
+              </thead>
+              <tbody id="boostTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="tableWrap" style="margin-top:10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>消費ダウン<span class="infoMark" data-info="指揮官スキルの「消費ダウン」のこと">i</span></th>
+                  <th>食料</th>
+                  <th>木材</th>
+                  <th>鋼材</th>
+                  <th>ガス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th style="text-align:left">なし</th>
+                  <td id="sumFoodNo">-</td>
+                  <td id="sumWoodNo">-</td>
+                  <td id="sumSteelNo">-</td>
+                  <td id="sumGasNo">-</td>
+                </tr>
+                <tr>
+                  <th style="text-align:left">あり</th>
+                  <td id="sumFoodYes">-</td>
+                  <td id="sumWoodYes">-</td>
+                  <td id="sumSteelYes">-</td>
+                  <td id="sumGasYes">-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /panelBoost -->
+
+  </div>
+
+<script>
+(() => {
+  // ④ 兵士ランクごとのポイント（死亡数ポイント増分の換算）
+  const RANK_POINTS = {
+    "T6": 20, "T7": 25, "T8": 33, "T9": 45,
+    "T10": 60, "T11": 80, "T12": 100, "T13": 125,
+  };
+
+  // ⑤ 到達表（累計死亡数ポイント → 加算ポイント）
+  const MILESTONES = [
+    { deathPoints: 10000, addPoints: 100 },
+    { deathPoints: 20000, addPoints: 150 },
+    { deathPoints: 40000, addPoints: 200 },
+    { deathPoints: 100000, addPoints: 250 },
+    { deathPoints: 200000, addPoints: 300 },
+    { deathPoints: 300000, addPoints: 350 },
+    { deathPoints: 400000, addPoints: 400 },
+    { deathPoints: 600000, addPoints: 450 },
+    { deathPoints: 800000, addPoints: 500 },
+    { deathPoints: 1000000, addPoints: 600 },
+  ];
+  const AFTER_1M_STEP = 500000;
+  const AFTER_1M_ADD = 200;
+
+  const $ = (id) => document.getElementById(id);
+
+  function num(v, fallback = NaN) {
+    // 空欄は 0 扱いにしない（未入力として扱う）
+    if (v === null || v === undefined) return fallback;
+    if (typeof v === "string" && v.trim() === "") return fallback;
+
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function fmt(n) {
+    if (!Number.isFinite(n)) return "-";
+    return Math.round(n).toLocaleString("ja-JP");
+  }
+
+
+  // 係数（0.7＋②×0.003）
+  function factorFromRate(aftershockRatePercent) {
+    return 0.7 + (aftershockRatePercent * 0.003);
+  }
+
+  // Aの推奨上限：①÷（0.7＋②×0.003）
+  function calcMaxSafe(hospitalCap, aftershockRatePercent) {
+    const factor = factorFromRate(aftershockRatePercent);
+    if (!Number.isFinite(factor) || factor <= 0) return NaN;
+    return hospitalCap / factor;
+  }
+
+  // 累計死亡数ポイント→加算ポイント
+  function pointsFromDeathPoints(deathPoints) {
+    let p = 0;
+    for (const m of MILESTONES) {
+      if (deathPoints >= m.deathPoints) p += m.addPoints;
+    }
+    if (deathPoints > 1000000) {
+      const extra = deathPoints - 1000000;
+      const blocks = Math.floor(extra / AFTER_1M_STEP);
+      p += blocks * AFTER_1M_ADD;
+    }
+    return p;
+  }
+
+  // 現在死亡数ポイントから、追加でneedAdditionalPoints稼ぐのに必要な最小の累計死亡数ポイント
+  function minDeathPointsFromCurrentForAdditionalPoints(currentDeathPoints, needAdditionalPoints) {
+    if (needAdditionalPoints <= 0) return Math.floor(currentDeathPoints);
+
+    const base = Math.max(0, Math.floor(currentDeathPoints));
+    const basePoints = pointsFromDeathPoints(base);
+
+    const candidates = MILESTONES
+      .map(m => m.deathPoints)
+      .filter(dp => dp >= base)
+      .sort((a,b)=>a-b);
+
+    for (const dp of candidates) {
+      const gain = pointsFromDeathPoints(dp) - basePoints;
+      if (gain >= needAdditionalPoints) return dp;
+    }
+
+    let dp = Math.max(base, 1000000);
+    while ((pointsFromDeathPoints(dp) - basePoints) < needAdditionalPoints) {
+      dp += AFTER_1M_STEP;
+      if (dp > 50000000) break;
+    }
+    return dp;
+  }
+
+  function show(el, on){ el.classList.toggle("hidden", !on); }
+
+  function setWarn(id, htmlText){
+    const el = $(id);
+    if (htmlText && String(htmlText).trim().length){
+      el.innerHTML = String(htmlText).replace(/\n/g,'<br>');
+      el.classList.add("show");
+    } else {
+      el.innerHTML = "";
+      el.classList.remove("show");
+    }
+  }
+
+  // Populate rank selects
+  function fillRankSelect(sel) {
+    sel.innerHTML = `<option value="">選択してください</option>`;
+    for (const r of Object.keys(RANK_POINTS)) {
+      const opt = document.createElement("option");
+      opt.value = r;
+      opt.textContent = r;
+      sel.appendChild(opt);
+    }
+  }
+
+  // Build A table (with a small placeholder shot for each input row)
+  function buildATable() {
+    const body = $("aTableBody");
+    body.innerHTML = "";
+    for (const r of Object.keys(RANK_POINTS)) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r}</td>
+        <td>
+          <input class="smallInput aCount" data-rank="${r}" type="number" min="0" step="1" placeholder="0" />
+        </td>
+        <td id="sub_${r}">0</td>
+      `;
+      body.appendChild(tr);
+    }
+    body.querySelectorAll(".aCount").forEach(inp => inp.addEventListener("input", updateA));
+  }
+
+  // Step gating
+  function step1Valid(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    return Number.isFinite(cap) && cap >= 0 && Number.isFinite(rate) && rate >= 0;
+  }
+
+  function updateStepVisibility(){
+    const ok1 = step1Valid();
+    show($("step2"), ok1);
+
+    const mode = $("mode").value;
+    show($("sectionA"), ok1 && mode === "A");
+    show($("sectionB"), ok1 && mode === "B");
+
+    if (!(ok1 && mode === "B")) {
+      show($("irregularBox"), false);
+      $("bSubCard").classList.add("hidden");
+    }
+  }
+
+  // A calc
+  // 病院（深部治療センター）収容チェック：推奨上限（=突撃できる最大兵士数）を超えたら警告文を返す
+  // factor = 0.7 + アフターショック率×0.003
+  function buildHospitalWarn(chargeCount, cap, factor){
+    if(!Number.isFinite(chargeCount) || !Number.isFinite(cap) || !Number.isFinite(factor) || factor <= 0) return "";
+    const recommended = Math.floor(cap / factor); // 推奨人数（突撃できる最大兵士数）
+    const exceed = Math.max(0, Math.ceil(chargeCount - recommended)); // ▲
+    if(exceed <= 0) return "";
+    const needLv = Math.ceil(exceed / 500); // ●
+    return `深部治療センターに収容できる人数を<span class="warn-num">${fmt(exceed)}</span>人超えています。\n` +
+           `病院を合計であと<span class="warn-num">${fmt(needLv)}</span>レベル上げれば、この人数でも突撃可能です（※深部が現在0人の場合）。`;
+  }
+
+  function updateA(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    if (!Number.isFinite(cap) || !Number.isFinite(rate)) {
+      $("aMaxSafe").textContent = "-";
+      if ($("aTotalPoints")) $("aTotalPoints").textContent = "-";
+      $("aTotalSoldiers").textContent = "-";
+      setWarn("aWarn", "");
+      return;
+    }
+
+    const maxSafe = Math.floor(calcMaxSafe(cap, rate));
+    $("aMaxSafe").textContent = fmt(maxSafe);
+
+    let totalSoldiers = 0;
+    let totalPoints = 0;
+    document.querySelectorAll(".aCount").forEach(inp => {
+      const r = inp.dataset.rank;
+      const c = Math.max(0, Math.floor(num(inp.value, 0)));
+      totalSoldiers += c;
+      const sub = c * RANK_POINTS[r];
+      totalPoints += sub;
+      $("sub_" + r).textContent = fmt(sub);
+    });
+
+    $("aTotalSoldiers").textContent = fmt(totalSoldiers);
+    // 表の右下（筆算）に、死亡数ポイント合計
+    if ($("aTotalPointsInline")) $("aTotalPointsInline").textContent = fmt(totalPoints);
+    // KPI側に、死亡数ポイント報酬の「実ポイント（目安）」
+    if ($("aDeathBonusRealPoints")) $("aDeathBonusRealPoints").textContent = fmt(pointsFromDeathPoints(totalPoints));
+    
+    if ($("aTotalPoints")) if ($("aTotalPoints")) $("aTotalPoints").textContent = fmt(totalPoints);
+
+    const factor = factorFromRate(rate);
+    const warn = buildHospitalWarn(totalSoldiers, cap, factor);
+    setWarn("aWarn", warn);
+  }
+
+  // B state
+  let lastNeedDeathDelta = 0;
+
+  function bInputsReady(){
+    const target = num($("targetPoints").value);
+    const curReal = num($("currentRealPoints").value);
+    const curDeath = num($("currentDeathPoints").value);
+    const mainRank = $("mainRank").value;
+    return Number.isFinite(target) && target >= 0 &&
+           Number.isFinite(curReal) && curReal >= 0 &&
+           Number.isFinite(curDeath) && curDeath >= 0 &&
+           mainRank;
+  }
+
+  function updateB(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    const factor = factorFromRate(rate);
+
+    if (!bInputsReady()){
+      $("bNeedPoints").textContent = "-";
+      $("bMainSoldiers").textContent = "-";
+      $("bSubSoldiers").textContent = "-";
+      $("bSubCard").classList.add("hidden");
+      setWarn("bWarn", "");
+      lastNeedDeathDelta = 0;
+      return;
+    }
+
+    const target = Math.floor(num($("targetPoints").value, 0));
+    const curReal = Math.floor(num($("currentRealPoints").value, 0));
+    const curDeath = Math.floor(num($("currentDeathPoints").value, 0));
+    const mainRank = $("mainRank").value;
+
+    const needRealPoints = Math.max(0, target - curReal);
+    $("bNeedPoints").textContent = fmt(needRealPoints);
+
+    const newDP = minDeathPointsFromCurrentForAdditionalPoints(curDeath, needRealPoints);
+    lastNeedDeathDelta = Math.max(0, newDP - curDeath);
+
+    const mainPer = RANK_POINTS[mainRank];
+    const mainNeed = mainPer > 0 ? Math.ceil(lastNeedDeathDelta / mainPer) : NaN;
+
+    const irregularOn = !$("irregularBox").classList.contains("hidden");
+    if (!irregularOn){
+      $("bMainSoldiers").textContent = fmt(mainNeed);
+      $("bSubCard").classList.add("hidden"); // ←サブは非表示
+      setWarn("bWarn", buildHospitalWarn(mainNeed, cap, factor));
+    } else {
+      updateIrregular();
+    }
+  }
+
+  function irregularInputsReady(){
+    return $("subRank").value && Number.isFinite(num($("mainCountManual").value));
+  }
+
+  function updateIrregular(){
+    const cap = num($("hospitalCap").value);
+    const rate = num($("aftershockRate").value);
+    const factor = factorFromRate(rate);
+
+    const mainRank = $("mainRank").value;
+    const subRank = $("subRank").value;
+    const mainPer = RANK_POINTS[mainRank];
+    const subPer = RANK_POINTS[subRank];
+
+    $("bSubCard").classList.remove("hidden"); // ←サブ表示ON
+
+    if (!irregularInputsReady()){
+      $("iMainConclusion").textContent = "-";
+      $("iSubConclusion").textContent = "-";
+      $("bSubSoldiers").textContent = "-";
+      setWarn("iWarn", "⑥ メイン兵士数 と サブランク を入力してください。");
+      setWarn("bWarn", "");
+      return;
+    }
+
+    const mainCount = Math.max(0, Math.floor(num($("mainCountManual").value, 0)));
+    const remain = Math.max(0, lastNeedDeathDelta - (mainCount * mainPer));
+    const subNeed = subPer > 0 ? Math.ceil(remain / subPer) : NaN;
+    const total = Number.isFinite(subNeed) ? (mainCount + subNeed) : NaN;
+
+    $("iMainConclusion").textContent = fmt(mainCount);
+    $("iSubConclusion").textContent = fmt(subNeed);
+
+    $("bMainSoldiers").textContent = fmt(mainCount);
+    $("bSubSoldiers").textContent = fmt(subNeed);
+
+    const warn = (Number.isFinite(cap) && Number.isFinite(total) && Number.isFinite(factor) && (total * factor) > cap)
+      ? buildHospitalWarn(total, cap, factor) : "";
+    setWarn("iWarn", warn);
+    setWarn("bWarn", warn);
+  }
+
+  // Mode change
+  function onModeChange(){
+    updateStepVisibility();
+    updateA();
+    updateB();
+  }
+
+  // Toggle irregular
+  $("toggleIrregular").addEventListener("click", () => {
+    const box = $("irregularBox");
+    box.classList.toggle("hidden");
+    if (box.classList.contains("hidden")) {
+      $("bSubCard").classList.add("hidden");
+      setWarn("iWarn", "");
+      updateB();
+    } else {
+      updateB();
+      updateIrregular();
+    }
+  });
+
+  // Init selects & table
+  fillRankSelect($("mainRank"));
+  fillRankSelect($("subRank"));
+  buildATable();
+
+  // Events
+  $("hospitalCap").addEventListener("input", () => { updateStepVisibility(); updateA(); updateB(); });
+  $("aftershockRate").addEventListener("input", () => { updateStepVisibility(); updateA(); updateB(); });
+  $("mode").addEventListener("change", onModeChange);
+
+  $("targetPoints").addEventListener("input", updateB);
+  $("currentRealPoints").addEventListener("input", updateB);
+  $("currentDeathPoints").addEventListener("input", updateB);
+  $("mainRank").addEventListener("change", () => { updateStepVisibility(); updateB(); });
+
+  $("subRank").addEventListener("change", () => { if (!$("irregularBox").classList.contains("hidden")) updateIrregular(); });
+  $("mainCountManual").addEventListener("input", () => { if (!$("irregularBox").classList.contains("hidden")) updateIrregular(); });
+
+  // Initial state (force correct hidden)
+  updateStepVisibility();
+  updateA();
+  updateB();
+})();
+
+
+  /* ===== Tabs switching ===== */
+  const tabSoldier = document.getElementById("tabSoldier");
+  const tabBoost = document.getElementById("tabBoost");
+  const panelSoldier = document.getElementById("panelSoldier");
+  const panelBoost = document.getElementById("panelBoost");
+
+  function showPanel(which){
+    const isSoldier = which === "soldier";
+    tabSoldier.classList.toggle("isActive", isSoldier);
+    tabBoost.classList.toggle("isActive", !isSoldier);
+    tabSoldier.setAttribute("aria-selected", isSoldier ? "true" : "false");
+    tabBoost.setAttribute("aria-selected", !isSoldier ? "true" : "false");
+    panelSoldier.classList.toggle("hidden", !isSoldier);
+    panelBoost.classList.toggle("hidden", isSoldier);
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }
+  window.showPanel = showPanel;
+  tabSoldier.addEventListener("click", ()=>showPanel("soldier"));
+  tabBoost.addEventListener("click", ()=>showPanel("boost"));
+
+  /* ===== Boost calc ===== */
+  // Tier coefficient (points per dead soldier-ish) and time coeff (sec-ish) arrays
+  const C = [4,6,8,12,15,20,25,33,45,60,80,100,125]; // T1..T13
+  const A = [18,23,30,39,51,67,88,115,150,197,260,400,600]; // T1..T13
+
+  // Resource base table (M*1e4 units) by tier+type (type: 0 fighter / 1 shooter / 2 rider / 3 vehicle)
+  const G = {
+    10:[30,10,0,0],11:[27,10,0,0],12:[24,12,0,0],13:[16,16,0,0],
+    20:[39,12,0,0],21:[36,12,0,0],22:[33,15,0,0],23:[22,22,0,0],
+    30:[51,15,0,0],31:[45,16,0,0],32:[40,20,0,0],33:[27,27,0,0],
+    40:[66,20,0,0],41:[60,20,0,0],42:[55,25,0,0],43:[36,36,0,0],
+    50:[87,25,0,0],51:[78,26,0,0],52:[71,32,0,0],53:[48,48,0,0],
+    60:[115,33,1,0],61:[105,34,1,0],62:[96,41,1,0],63:[66,66,0,0],
+    70:[149,44,3,0],71:[135,45,2,0],72:[124,54,2,0],73:[85,85,1,0],
+    80:[206,60,8,1],81:[188,60,7,1],82:[171,73,6,1],83:[121,121,5,1],
+    90:[623,181,33,5],91:[570,181,30,4],92:[519,219,28,4],93:[364,364,22,3],
+    100:[1530,443,115,16],101:[1391,444,105,15],102:[1266,538,96,14],103:[888,888,76,11],
+    110:[4203,1246,414,57],111:[3823,1247,376,52],112:[3478,1511,342,47],113:[2442,2442,271,38],
+    120:[10880,3226,1624,223],121:[9894,3228,1476,202],122:[8998,3910,1342,184],123:[6322,6322,1063,147],
+    130:[25000,7424,4545,625],131:[22727,7424,4132,567],132:[20661,9005,3756,515],133:[14514,14514,2971,409]
+  };
+
+  const trainBlocksEl = document.getElementById("trainBlocks");
+  const charge2Wrap = document.getElementById("charge2Wrap");
+
+  function fillTier(sel){
+    sel.innerHTML = "";
+    for(let t=1;t<=13;t++){
+      const opt=document.createElement("option");
+      opt.value = String(t);
+      opt.textContent = "T"+t;
+      sel.appendChild(opt);
+    }
+  }
+
+  // Setup charge tier selects
+  const chargeTier1 = document.getElementById("chargeTier1");
+  const chargeTier2 = document.getElementById("chargeTier2");
+  fillTier(chargeTier1); fillTier(chargeTier2);
+  chargeTier1.value = "9";
+  chargeTier2.value = "7";
+
+  function fmtDuration(sec){
+    sec = Math.max(0, Math.floor(sec));
+    const d = Math.floor(sec/86400); sec -= d*86400;
+    const h = Math.floor(sec/3600); sec -= h*3600;
+    const m = Math.floor(sec/60); sec -= m*60;
+    const parts=[];
+    if(d) parts.push(d+"日");
+    if(d||h) parts.push(h+"時間");
+    if(d||h||m) parts.push(m+"分");
+    parts.push(sec+"秒");
+    return parts.join("");
+  }
+  function toM2(x){ return (Math.round(x/1e4)/100); } // -> M with 2 decimals
+
+  function perOneCA(tier, ug){
+    const v = ug>0 ? (C[tier-1]-C[ug-1]) : C[tier-1];
+    const d = ug>0 ? (A[tier-1]-A[ug-1]) : A[tier-1];
+    return {v, d};
+  }
+  function perOneRes(tier, ug, type){
+    const base = G[String(tier)+String(type)];
+    if(!base) return null;
+    if(ug>0){
+      const u = G[String(ug)+String(type)];
+      if(!u) return null;
+      return [base[0]-u[0], base[1]-u[1], base[2]-u[2], base[3]-u[3]];
+    }
+    return [...base];
+  }
+
+  // ---- Input mode (manual boost vs charge) ----
+  const modeManual = document.getElementById("boostModeManual");
+  const modeCharge = document.getElementById("boostModeCharge");
+  const manualFields = document.getElementById("manualModeFields");
+  const chargeFields = document.getElementById("chargeModeFields");
+  const deathBoostManual = document.getElementById("deathBoostManual");
+
+  function updateBoostModeUI(){
+    const isManual = modeManual?.checked;
+    manualFields?.classList.toggle("hidden", !isManual);
+    chargeFields?.classList.toggle("hidden", !!isManual);
+    // If manual, hide charge2 UI button too (optional) - chargeFields already hidden
+    calcBoost();
+  }
+  if(modeManual && modeCharge){
+    modeManual.addEventListener("change", updateBoostModeUI);
+    modeCharge.addEventListener("change", updateBoostModeUI);
+  }
+
+  // ---- Train blocks ----
+  const maxTrainBlocks = 4;
+  function createTrainBlock(i){
+    const div=document.createElement("div");
+    div.className="trainBlock";
+
+    div.innerHTML = `
+      <div class="trainHead">訓練兵士${i}</div>
+      <div class="row3">
+        <div class="field">
+          <div class="label">訓練ティア</div>
+          <select class="trainTier"></select>
+        </div>
+        <div class="field">
+          <div class="label">兵種</div>
+          <select class="trainType">
+            <option value="0">ファイター</option>
+            <option value="1">シューター</option>
+            <option value="2">ライダー</option>
+            <option value="3">車両</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="label">配分（%） </div>
+          <input class="alloc" type="number" min="0" max="100" step="1" value="${i===1?100:0}">
+        </div>
+      </div>
+
+      <div class="ugRow">
+        <div class="ugBox">
+          <label class="ugCheck">
+            <input class="useUg" type="checkbox">
+            <span>既存の兵士をアップグレードする場合はチェック</span>
+          </label>
+          <div class="ugPick hidden">
+            <span class="ugLabel">アップグレード前のティア</span>
+            <select class="ugTier"></select>
+          </div>
+        </div>
+      </div>
+
+      </div>
+      <div class="trainActions"></div>
+    `;
+
+    const tierSel = div.querySelector(".trainTier");
+    const ugSel = div.querySelector(".ugTier");
+    fillTier(tierSel); fillTier(ugSel);
+    tierSel.value="9"; ugSel.value="7";
+
+    const ugChk = div.querySelector(".useUg");
+    const ugPick = div.querySelector(".ugPick");
+    const syncUg = ()=> ugPick.classList.toggle("hidden", !ugChk.checked);
+    ugChk.addEventListener("change", ()=>{ syncUg(); calcBoost(); });
+    syncUg();
+
+    if(i>1){
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="toggle removeTrain";
+      btn.textContent="この訓練兵士を削除";
+      btn.addEventListener("click", ()=>{
+        div.remove();
+        normalizeAlloc();
+        calcBoost();
+      });
+      div.querySelector(".trainActions").appendChild(btn);
+    }
+
+    div.addEventListener("input", ()=>{ normalizeAlloc(false); calcBoost(); });
+    div.addEventListener("change", ()=>{ normalizeAlloc(false); calcBoost(); });
+    return div;
+  }
+
+  function getTrainBlockCount(){ return trainBlocksEl.querySelectorAll(".trainBlock").length; }
+
+  function normalizeAlloc(forceFix=true){
+    const blocks = Array.from(trainBlocksEl.querySelectorAll(".trainBlock"));
+    if(blocks.length===0) return;
+    const sum = blocks.reduce((a,b)=> a + (Number(b.querySelector(".alloc").value)||0), 0);
+    if(sum===0 && forceFix){
+      blocks[0].querySelector(".alloc").value="100";
+    }
+  }
+
+  function addTrain(){
+    const n=getTrainBlockCount();
+    if(n>=maxTrainBlocks) return;
+    trainBlocksEl.appendChild(createTrainBlock(n+1));
+    normalizeAlloc(true);
+    calcBoost();
+  }
+
+  // init 1 block
+  trainBlocksEl.innerHTML = "";
+  addTrain();
+
+  const addTrainBtn = document.getElementById("addTrainBlock");
+  if(addTrainBtn){
+    addTrainBtn.addEventListener("click", addTrain);
+  }
+
+  const equalAllocBtn = document.getElementById("equalAlloc");
+  if(equalAllocBtn){
+    equalAllocBtn.addEventListener("click", ()=>{
+      const blocks = Array.from(trainBlocksEl.querySelectorAll(".trainBlock"));
+      const n = blocks.length || 1;
+      const base = Math.floor(100/n);
+      let rem = 100 - base*n;
+      blocks.forEach((b,idx)=>{
+        b.querySelector(".alloc").value = String(base + (idx<rem?1:0));
+      });
+      calcBoost();
+    });
+  }
+
+  // ---- charge2 toggles ----
+  const addCharge2Btn = document.getElementById("addCharge2");
+  const removeCharge2Btn = document.getElementById("removeCharge2");
+
+  addCharge2Btn?.addEventListener("click", ()=>{
+    charge2Wrap.classList.remove("hidden");
+    addCharge2Btn.classList.add("hidden");
+    calcBoost();
+  });
+  removeCharge2Btn?.addEventListener("click", ()=>{
+    charge2Wrap.classList.add("hidden");
+    addCharge2Btn.classList.remove("hidden");
+    document.getElementById("chargeNum2").value="0";
+    calcBoost();
+  });
+
+  // ---- main calc ----
+  function calcBoost(){
+    const speed = Math.max(0, Number(document.getElementById("trainSpeed").value)||0);
+    const costDown = Math.max(0, Number(document.getElementById("trainCostDown").value)||0);
+
+    // Determine B (death boost points)
+    let B = 0;
+    if(modeManual && modeManual.checked){
+      B = Math.max(0, Math.floor(Number(deathBoostManual.value)||0));
+    } else {
+      const ct1 = Number(chargeTier1.value)||1;
+      const cn1 = Math.max(0, Number(document.getElementById("chargeNum1").value)||0);
+      const ct2 = Number(chargeTier2.value)||1;
+      const cn2 = charge2Wrap.classList.contains("hidden") ? 0 : Math.max(0, Number(document.getElementById("chargeNum2").value)||0);
+      const raw = cn1*C[ct1-1] + cn2*C[ct2-1];
+      B = Math.ceil(raw * 1.2);
+    }
+
+    document.getElementById("outDeathBoost").textContent = (B||0).toLocaleString("ja-JP");
+
+    const blocks = Array.from(trainBlocksEl.querySelectorAll(".trainBlock"));
+    const tbody = document.getElementById("boostTableBody");
+    tbody.innerHTML = "";
+
+    let totalSec = 0;
+
+    let sumFoodNo=0, sumWoodNo=0, sumSteelNo=0, sumGasNo=0;
+    let sumFoodYes=0, sumWoodYes=0, sumSteelYes=0, sumGasYes=0;
+
+    const allocSum = blocks.reduce((a,b)=> a + (Number(b.querySelector(".alloc").value)||0), 0) || 1;
+
+    blocks.forEach((b, idx)=>{
+      const tier = Number(b.querySelector(".trainTier").value)||1;
+      const type = Number(b.querySelector(".trainType").value)||0;
+      const useUg = b.querySelector(".useUg").checked;
+      const ug = useUg ? (Number(b.querySelector(".ugTier").value)||0) : 0;
+      const alloc = Math.max(0, Number(b.querySelector(".alloc").value)||0);
+
+      const share = alloc / allocSum;
+      const Bi = Math.ceil(B * share);
+
+      const {v, d} = perOneCA(tier, ug);
+      const m = v>0 ? Math.ceil(Bi / v) : 0;
+      const sec = (m*d) / (1 + speed/100);
+      totalSec += sec;
+
+      const r = perOneRes(tier, ug, type);
+      let food=0,wood=0,steel=0,gas=0;
+      if(r){
+        const foodNo = toM2(r[0]*m);
+        const woodNo = toM2(r[1]*m);
+        const steelNo= toM2(r[2]*m);
+        const gasNo  = toM2(r[3]*m);
+
+        const factor = 1 - costDown/100;
+        food = toM2(r[0]*m*factor);
+        wood = toM2(r[1]*m*factor);
+        steel= toM2(r[2]*m*factor);
+        gas  = toM2(r[3]*m*factor);
+
+        sumFoodNo += foodNo; sumWoodNo += woodNo; sumSteelNo += steelNo; sumGasNo += gasNo;
+        sumFoodYes += food; sumWoodYes += wood; sumSteelYes += steel; sumGasYes += gas;
+      }
+
+      const fullType = ["ファイター","シューター","ライダー","車両"][type] || "";
+      const label = `T${tier} / ${fullType}${useUg?`（UG元:T${ug}）`:""}`;
+      const tr=document.createElement("tr");
+      tr.innerHTML = `
+        <td style="text-align:left">${label}</td>
+        <td>${alloc}</td>
+        <td>${m.toLocaleString("ja-JP")}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("outNeedBoost").textContent = fmtDuration(totalSec);
+
+    const setM = (id, v)=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      el.textContent = Number.isFinite(v) ? (v.toFixed(2)+"M") : "-";
+    };
+    setM("sumFoodNo", sumFoodNo); setM("sumWoodNo", sumWoodNo); setM("sumSteelNo", sumSteelNo); setM("sumGasNo", sumGasNo);
+    setM("sumFoodYes", sumFoodYes); setM("sumWoodYes", sumWoodYes); setM("sumSteelYes", sumSteelYes); setM("sumGasYes", sumGasYes);
+
+    const info = document.getElementById("boostFromChargeInfo");
+    if(info){
+      if(modeManual && modeManual.checked){
+        info.textContent = `入力ブースト: ${(B||0).toLocaleString("ja-JP")} pt`;
+        info.classList.toggle("show", (B||0)>0);
+      }else{
+        // show only if any charge input
+        const cn1 = Math.max(0, Number(document.getElementById("chargeNum1").value)||0);
+        const cn2 = charge2Wrap.classList.contains("hidden") ? 0 : Math.max(0, Number(document.getElementById("chargeNum2").value)||0);
+        const msg = (cn1||cn2) ? `突撃から算出: ${(B||0).toLocaleString("ja-JP")} pt` : "";
+        info.textContent = msg;
+        info.classList.toggle("show", !!msg);
+      }
+    }
+  }
+
+  // bind boost inputs
+  ["trainSpeed","trainCostDown","chargeTier1","chargeNum1","chargeTier2","chargeNum2","deathBoostManual"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.addEventListener("input", calcBoost);
+      el.addEventListener("change", calcBoost);
+    }
+  });
+
+  // initial UI
+  updateBoostModeUI();
+  calcBoost();
+
+  /* ===== Transfer from Soldier calc to Boost (A/B) ===== */
+  function rankToTier(rankStr){
+    if(!rankStr) return null;
+    const m = String(rankStr).match(/T(\d+)/i);
+    return m ? parseInt(m[1],10) : null;
+  }
+  function pickTop2FromA(){
+    const pairs = [];
+    document.querySelectorAll(".aCount").forEach(inp=>{
+      const tier = rankToTier(inp.dataset.rank);
+      const num  = Math.max(0, Number(inp.value)||0);
+      if(tier && num>0) pairs.push({tier, num});
+    });
+    pairs.sort((x,y)=>y.num-x.num);
+    return pairs.slice(0,2);
+  }
+  function pickTop2FromB(){
+    const pairs = [];
+    const mainTier = rankToTier(document.getElementById("mainRank")?.value);
+    const mainNum  = Math.max(0, Number((document.getElementById("bMainSoldiers")?.textContent||"0").replace(/,/g,'')));
+    if(mainTier && mainNum>0) pairs.push({tier: mainTier, num: mainNum});
+
+    const subCardVisible = !document.getElementById("bSubCard")?.classList.contains("hidden");
+    if(subCardVisible){
+      const subTier = rankToTier(document.getElementById("subRank")?.value);
+      const subNum  = Math.max(0, Number((document.getElementById("bSubSoldiers")?.textContent||"0").replace(/,/g,'')));
+      if(subTier && subNum>0) pairs.push({tier: subTier, num: subNum});
+    }
+    pairs.sort((x,y)=>y.num-x.num);
+    return pairs.slice(0,2);
+  }
+
+  function applyChargePairs(pairs){
+    if(!pairs || pairs.length === 0) return;
+
+    // ensure "突撃する兵士の情報から算出する" mode
+    if(modeCharge){
+      modeCharge.checked = true;
+    }
+    updateBoostModeUI();
+
+    // apply charge #1
+    chargeTier1.value = String(pairs[0].tier);
+    document.getElementById("chargeNum1").value = String(pairs[0].num);
+
+    // apply charge #2 (optional)
+    if(pairs.length >= 2){
+      charge2Wrap.classList.remove("hidden");
+      addCharge2Btn?.classList.add("hidden");
+      chargeTier2.value = String(pairs[1].tier);
+      document.getElementById("chargeNum2").value = String(pairs[1].num);
+    }else{
+      charge2Wrap.classList.add("hidden");
+      addCharge2Btn?.classList.remove("hidden");
+      document.getElementById("chargeNum2").value = "0";
+    }
+
+    calcBoost();
+  }
+
+  const btnA = document.getElementById("toBoostFromA");
+  btnA?.addEventListener("click", ()=>{
+    const pairs = pickTop2FromA();
+    applyChargePairs(pairs);
+    showPanel("boost");
+  });
+
+  const btnB = document.getElementById("toBoostFromB");
+  btnB?.addEventListener("click", ()=>{
+    const pairs = pickTop2FromB();
+    applyChargePairs(pairs);
+    showPanel("boost");
+  });
+
+</script>
+</body>
+</html>
