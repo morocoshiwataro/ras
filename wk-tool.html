@@ -3,29 +3,536 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>荒野の王：計算ツール</title>
-  <link rel="stylesheet" href="site.css">
+  <title>荒野の王 兵士数・ポイント計算ツール</title>
+  <style>
+    :root{
+      --bg: #0f0c07;
+      --card: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.64);
+      --accent: #c79a4b;
+      --warn: #ff4d4d;
+      --shadow: 0 10px 24px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(199,154,75,.22), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(122,79,29,.20), transparent 65%),
+        linear-gradient(180deg, #120f0a 0%, #0b0906 100%);
+      min-height:100dvh;
+    }
+    .wrap{ max-width: 900px; margin: 0 auto; padding: 18px 14px 30px; }
+
+    header{ margin-bottom: 14px; }
+    h1{
+      margin:0;
+      font-size: 22px; /* ←少し大きめ */
+      letter-spacing: .02em;
+      line-height: 1.2;
+    }
+    .sub{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.04) 100%);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .section{ margin-top: 12px; }
+    .sectionTitle{
+      display:flex; align-items:center; gap:10px;
+      margin: 2px 0 10px;
+      font-size: 14px; font-weight: 900;
+    }
+    .step{
+      width: 24px; height: 24px;
+      display:inline-grid; place-items:center;
+      border-radius: 8px;
+      background: rgba(199,154,75,.18);
+      border: 1px solid rgba(199,154,75,.28);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 12px;
+      flex: 0 0 auto;
+    }
+
+    label{
+      display:block;
+      font-size: 13px;
+      font-weight: 800;
+      margin: 10px 0 6px;
+    }
+    .req{
+      display:inline-block;
+      margin-left: 6px;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(199,154,75,.35);
+      color: var(--accent);
+      background: rgba(199,154,75,.10);
+      vertical-align: middle;
+    }
+
+    /* placeholder screenshot */
+    .shot{
+      width: 100%;
+      height: auto;          /* 高さ固定をやめる */
+      max-height: 240px;     /* 必要なら上限 */
+      object-fit: contain;   /* 全体を表示 */
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      display:block;
+      margin: 8px 0 8px;
+    }
+    .shot.sm{
+      height: 40px;
+      border-radius: 10px;
+      margin: 6px 0;
+    }
+
+    input, select{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,.85);
+      background: rgba(0,0,0,.35);
+      color: var(--text);
+      outline: none;
+      font-size: 16px;
+    }
+    input::placeholder{ color: rgba(255,255,255,.35); }
+    input:focus, select:focus{
+      border-color: rgba(199,154,75,.55);
+      box-shadow: 0 0 0 3px rgba(199,154,75,.16);
+    }
+
+    .hint{ margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .grid{ display:grid; gap: 10px; grid-template-columns: 1fr; }
+    @media (min-width: 720px){
+      .grid.two{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .divider{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
+    .hidden{ display:none; }
+
+    /* Results */
+    .results{ margin-top: 12px; display:grid; gap: 10px; }
+    .kpi{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      padding: 12px;
+    }
+    .kpi .name{ font-size: 12px; color: var(--muted); }
+    .kpi .value{
+      margin-top: 6px;
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: .02em;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+    }
+    .kpi .unit{ font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 800; }
+    .kpi .mini{ margin-top: 6px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+    .warnBar{
+      margin-top: 10px;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      border: 1px solid rgba(255,77,77,.35);
+      background: rgba(255,77,77,.12);
+      color: #ffd7d7;
+      font-weight: 950;
+      display:none;
+    }
+    .warnBar.show{ display:block; }
+
+    /* Table (A breakdown) */
+    .tableWrap{
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: rgba(0,0,0,.18);
+    }
+    table{ width:100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    th, td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: right;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    th:first-child, td:first-child{ text-align:left; }
+    th{
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,.04);
+    }
+    tr:last-child td{ border-bottom: none; }
+
+    /* A：合計（筆算っぽく表示） */
+    .sumBox{
+      padding: 10px 10px 12px;
+    }
+    .sumBox .bar{
+      height: 1px;
+      background: rgba(255,255,255,.22);
+      margin: 6px 0 8px;
+    }
+    .sumBox .sumLine{
+      display:flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .sumBox .label{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sumBox .num{
+      font-size: 16px;
+      font-weight: 950;
+      color: rgba(255,255,255,.92);
+    }
+    .sumBox .unit{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .smallInput{
+      padding: 10px 10px;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+
+    .toggle{
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(199,154,75,.30);
+      background: rgba(199,154,75,.12);
+      color: #ffe7be;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    footer{
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    footer b{ color: rgba(255,255,255,.85); }
+
+    /* 各入力項目の区切り線 */
+    .grid > div {
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.18);
+    }
+
+    /* 最後の項目だけ線を消す */
+    .grid > div:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.22);
+    }
+
+    /* 一番最初の section は線なし */
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .results {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.25);
+    }    
+  
+    /* ===== Tabs (full width 2 tabs) ===== */
+    .tabBar{
+      display:flex;
+      gap:0;
+      margin: 12px 0 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(255,255,255,.04);
+    }
+    .tabBtn{
+      flex:1;
+      padding: 12px 10px;
+      background: transparent;
+      border: 0;
+      color: rgba(255,255,255,.70);
+      font-weight: 950;
+      cursor: pointer;
+      position: relative;
+    }
+    .tabBtn + .tabBtn{
+      border-left: 1px solid rgba(255,255,255,.10);
+    }
+    .tabBtn.isActive{
+      color: rgba(255,255,255,.95);
+      background: rgba(199,154,75,.14);
+    }
+    .tabBtn.isActive::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:4px;
+      background: rgba(199,154,75,.85);
+    }
+    .tabPanel{ margin-top: 12px; }
+    .tabPanel.hidden{ display:none !important; }
+
+    /* ===== Info mark (used instead of 必須) ===== */
+    .infoMark{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 18px;
+      height: 18px;
+      margin-left: 6px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 950;
+      vertical-align: middle;
+      cursor: help;
+      position: relative;
+      color: #0f0c07;
+      background: rgba(199,154,75,.92);
+      box-shadow: 0 0 0 2px rgba(199,154,75,.18);
+    }
+    .infoMark:hover{ filter: brightness(1.05); }
+
+    .infoMark::after{
+      content: attr(data-info);
+      position: absolute;
+      bottom: 135%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: normal;
+      max-width: min(320px, calc(100vw - 24px));
+      text-align: left;
+      background: rgba(0,0,0,.85);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .12s ease;
+      z-index: 20;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .infoMark::before{
+      content:"";
+      position:absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: rgba(0,0,0,.85) transparent transparent transparent;
+      opacity: 0;
+      transition: opacity .12s ease;
+      z-index: 20;
+    }
+    .infoMark:hover::after,
+    .infoMark:hover::before{
+      opacity: 1;
+    }
+
+    /* small action button */
+    .actionBtn{
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(199,154,75,.30);
+      background: rgba(255,255,255,.06);
+      color: #ffe7be;
+      font-weight: 950;
+      cursor: pointer;
+    }
+    .actionBtn:hover{ background: rgba(199,154,75,.12); }
+
+    .warn-num{font-size:1.35em;font-weight:900;line-height:1;display:inline-block;padding:0 .15em;}
+
+    /* ===== Train block layout tweaks ===== */
+    .grid.three{ display:grid; grid-template-columns: 1fr 1fr 180px; gap: 14px; }
+    .allocLabel{ display:flex; align-items:center; gap:8px; }
+    .ugLine{ display:flex; align-items:center; gap:12px; margin-top:10px; flex-wrap:wrap; }
+    .ugToggle{ display:flex; align-items:center; gap:8px; font-weight:850; }
+    .ugSelect{ display:flex; align-items:center; gap:8px; }
+    .ugSelect select{ min-width: 120px; }
+
+.trainBlock{ margin-top:14px; padding:14px; border:1px solid rgba(255,255,255,.10); border-radius:14px; background: rgba(0,0,0,.12); }
+    .trainHead{ font-weight:900; margin-bottom:10px; }
+    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px; align-items:end; }
+    .row3 .field .label{ font-size:12px; color: rgba(255,255,255,.75); margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+    .ugRow{ display:flex; align-items:center; gap:14px; margin-top:10px; flex-wrap:wrap; }
+    .checkLine{ display:flex; align-items:center; gap:8px; }
+    .ugPick{ display:flex; align-items:center; gap:8px; }
+/* ===== Upgrade row ===== */
+    .ugBox{
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.12);
+      padding:10px 12px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+    .ugCheck{ display:flex; align-items:center; gap:10px; font-weight:900; }
+    .ugCheck span{ white-space:nowrap; }
+    .ugPick{ display:flex; align-items:center; gap:10px; }
+    .ugLabel{ font-weight:900; white-space:nowrap; opacity:.9; }
+
+    /* ===== Radio (override global input styles) ===== */
+    .radioRow{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+    label.radio{ display:flex; align-items:center; gap:10px; margin:0; font-size:14px; font-weight:850; }
+    label.radio input[type="radio"]{
+      width:auto; padding:0; border:0; background:transparent;
+      appearance:auto; -webkit-appearance:radio;
+      transform: scale(1.05);
+      flex:0 0 auto;
+    }
+
+
+    @media (max-width: 520px){
+      /* On phones, align tooltip to the icon's right edge to avoid being cut off on the left */
+      .infoMark::after{
+        left: auto;
+        right: 0;
+        transform: none;
+        max-width: calc(100vw - 24px);
+      }
+    }
+
+    /* PATCH: layout helpers */
+    .footer-wrap{max-width:900px;margin:0 auto;padding:0 12px}
+    .update-out{max-width:1100px;margin:0 auto 12px auto;padding:0 12px}
+    .noticeRed{margin-top:10px;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,60,60,.65);background:rgba(255,0,0,.08);color:#ff7b7b;font-weight:800;line-height:1.35}
+    .img-row{display:flex;gap:12px;flex-wrap:wrap}
+    .img-row img{flex:1 1 48%;max-width:100%}
+    @media(max-width:600px){.img-row img{flex:1 1 100%}}
+
+    /* FIX: img-row内のスクショは横並び（スマホは縦） */
+    .img-row .shot{width:auto;flex:1 1 48%;max-width:100%}
+    @media(max-width:600px){.img-row .shot{flex:1 1 100%}}
+
+    .footerText{
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0 6px;
+      color: rgba(255,255,255,.78);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    /* form controls: avoid applying width:100% to checkbox/radio */
+    input[type="checkbox"], input[type="radio"]{ width:auto !important; min-width:auto !important; height:auto !important; }
+    .line label{ justify-content:flex-start; }
+
+
+    .modeANote{ margin-top:10px; }
+    .modeANoteInner{
+      border:1px solid rgba(255,60,60,.6);
+      background: rgba(120,10,10,.18);
+      color: #ffb3b3;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+    
+    /* 【最終上書き】戦後回復ブースト画像(07/08)だけを強制的に横並び */
+    .img-row {
+      display: flex !important;
+      gap: 12px !important;
+      flex-wrap: nowrap !important;
+    }
+
+    .img-row img {
+      width: 50% !important;
+      max-width: 50% !important;
+      flex: 0 0 50% !important;
+    }
+
+    /* スマホ時だけ縦に戻す */
+    @media (max-width: 600px) {
+      .img-row {
+        flex-direction: column !important;
+      }
+
+      .img-row img {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 1 100% !important;
+      }
+    }
+</style>
 </head>
 <body>
   <div class="wrap">
-    <div class="siteHeader"><a href="home.html">【ras】鯛せんべい用：まとめサイト</a></div>
-
     <header>
-      <h1>荒野の王 兵士数・ポイント計算ツール</h1>
+      <h1>荒野の王 兵士計算ツール（β版）</h1>
       <div class="sub">
-        隔週であるイベント「荒野の王」の計算補助ツールです。</br>
-        砲台を攻撃する兵士の数を計算する「攻撃する兵士数の計算」と、
-        その後の訓練に必要な資源・ブースト等が計算できる「資源・ブースト計算」ができます。</br>
+        イベント「荒野の王」で使える初心者向けの計算支援ツールです。</br>
+        砲台攻撃する兵士の数を目的別で計算する「兵士数の計算」と、</br>
+        その後の訓練で必要になる「資源・ブーストの計算」ができます。</br>
         </br>
-        お気づきの点や不具合報告、ご意見・ご要望は気軽にmorocoshiwataroまで！</br>
-        ※入力は上から順にお願いします。
+        ※不具合報告、質問・ご意見・ご要望等はmorocoshiwataro(R@R)までお気軽に！</br>
       </div>
-    <div class="sub"><a href="home.html">← ホームに戻る</a></div>
-</header>
+    </header>
+
+
+  <div class="update-out">
+    <div class="card" style="background: linear-gradient(180deg, rgba(255,140,0,.22), rgba(255,140,0,.10)); border:1px solid rgba(255,170,60,.35);">
+      <div style="font-weight:900; margin-bottom:6px;">●アップデート情報</div>
+      <div style="color:rgba(255,255,255,.85); font-size:14px;">
+        【1/24：アップデート】戦後回復ブーストの確認方法を記載</br>
+        【1/24：アップデート】兵士を増やす！を選択した際の注意書きを追記</br>
+        【1/24：アップデート】実装：アップデート欄、戦地救助計算</br>
+        【1/10：不具合修正】ブースト計算に戦後回復・国バフを反映
+      </div>
+    </div>
+  </div>
 
     <div class="card">
       <div class="tabBar" role="tablist" aria-label="計算タブ">
-        <button class="tabBtn isActive" id="tabSoldier" type="button" aria-selected="true">攻撃する兵士数の計算</button>
+        <button class="tabBtn isActive" id="tabSoldier" type="button" aria-selected="true">兵士数の計算</button>
         <button class="tabBtn" id="tabBoost" type="button" aria-selected="false">資源・ブースト計算（おまけ）</button>
       </div>
 
@@ -45,12 +552,20 @@
           </div>
 
           <div>
-            <label>② アフターショック率（%）<span class="infoMark" data-info="指揮官情報（顔アイコン）＞強化情報＞部隊強化">i</span></label>
+            <label>アフターショック率（%）<span class="infoMark" data-info="指揮官情報（顔アイコン）＞強化情報＞部隊強化">i</span></label>
             <img class="shot" src="images/02.png" alt="アフターショック率の確認画面" />
             <input id="aftershockRate" type="number" min="0" step="0.01" placeholder="例：14" />
             <div class="hint">入力は「%の数値」（11.5% → 11.5）</div>
           </div>
         </div>
+
+          <div class="line" style="margin-top:10px">
+            <label style="display:flex;align-items:center;gap:10px; font-weight:900;">
+              <input id="battleRescue" type="checkbox" />
+              指揮官スキル「戦地救助（※）」を使う場合はチェック
+            </label>
+            <div class="hint">※死亡（消滅）数の30%が深部治療センターへ送られます。効果時間は30分なので注意して使ってください。</div>
+          </div>
       </div>
 
       <!-- Step 2 (only after step1 valid) -->
@@ -63,6 +578,11 @@
           <option value="A">兵士を増やす！（なるべく多くの戦後回復ブーストを獲得する）</option>
           <option value="B">ポイント重視！（目標ポイントに必要な分だけ兵を殺す）</option>
         </select>
+
+        <div id="modeANote" class="noticeRed hidden">
+          こちらは初回の攻撃時（死亡ポイントをもっていない状態）のみ正しく計算ができます。<br/>
+          不足ポイント分を稼ぎたい等ポイントが基準の場合は必ず「ポイント重視！」を選んでください
+        </div>
       </div>
 
       <!-- A -->
@@ -110,6 +630,11 @@
             <div class="name">死亡数ポイントで獲得できる実ポイント（目安）</div>
             <div class="value"><span id="aDeathBonusRealPoints">-</span><span class="unit">ポイント</span></div>
           </div>
+
+          <div class="kpi">
+            <div class="name">深部行きになる兵士数</div>
+            <div class="value"><span id="aDeepCount">-</span><span class="unit">人</span></div>
+          </div>
           <div class="kpi">
             <div class="name">入力した突撃人数の合計</div>
             <div class="value"><span id="aTotalSoldiers">-</span><span class="unit">人</span></div>
@@ -155,6 +680,19 @@
             <select id="mainRank"></select>
             <button class="toggle" id="toggleIrregular" type="button">兵士が1種類では足りない場合（サブを使う）</button>
           </div>
+          <div id="irregularInputs" class="hidden">
+          <div class="sectionTitle"><span class="step">＋</span>サブを使う場合</div>
+          <div class="grid two">
+            <div>
+              <label>サブで突撃させる兵士ランク</label>
+              <select id="subRank"></select>
+            </div>
+            <div>
+              <label>メインで突撃させる兵士数（手入力）</label>
+              <input id="mainCountManual" type="number" min="0" step="1" placeholder="例：20000" />
+            </div>
+          </div>
+          </div>
         </div>
 
         <!-- B results: BEFORE irregular (no sub) -->
@@ -162,6 +700,11 @@
           <div class="kpi">
             <div class="name">不足ポイント（目標−現在）</div>
             <div class="value"><span id="bNeedPoints">-</span><span class="unit">ポイント</span></div>
+          </div>
+
+          <div class="kpi">
+            <div class="name">深部行きになる兵士数</div>
+            <div class="value"><span id="bDeepCount">-</span><span class="unit">人</span></div>
           </div>
 
           <div class="kpi">
@@ -181,19 +724,6 @@
         <button class="actionBtn" id="toBoostFromB" type="button">ブースト計算へ反映して移動</button>
 
         <div class="section hidden" id="irregularBox" style="margin-top: 10px;">
-          <div class="sectionTitle"><span class="step">＋</span>サブを使う場合</div>
-
-          <div class="grid two">
-            <div>
-              <label>サブで突撃させる兵士ランク</label>
-              <select id="subRank"></select>
-            </div>
-            <div>
-              <label>メインで突撃させる兵士数（手入力）</label>
-              <input id="mainCountManual" type="number" min="0" step="1" placeholder="例：20000" />
-            </div>
-          </div>
-
           <!-- After irregular ON: show ONLY one sub number (sub soldiers) -->
           <div class="results">
             <div class="kpi">
@@ -209,18 +739,11 @@
           <div class="warnBar" id="iWarn"></div>
         </div>
       </div>
-    </div>
-    <footer>
-      <b>利用条件</b><br/>
-      本ページは、閲覧者が個人的に計算を行う目的に限り利用できます。<br/>
-      また、作者morocoshiwataroに許可なく本URLを外部に渡すことを禁止します。その場合、本ページを閉鎖する可能性があります。<br/>
-      本ページの計算内容・ロジック・数式・ソースコード等の転載は禁止での転載・流用・再配布・二次利用（別サイト/アプリ等への組み込みを含む）を禁止します。
-    </footer>
-      </div><!-- /panelSoldier -->
+</div><!-- /panelSoldier -->
 
       <div class="tabPanel hidden" id="panelBoost">
         <div class="section">
-          <div class="sectionTitle"><span class="step">1</span>まず、訓練環境の情報を入力してください。</div>
+          <div class="sectionTitle"><span class="step">1</span>訓練環境の情報を入力してください。</div>
           <div class="grid two">
             <div>
               <label>訓練速度（%）<span class="infoMark" data-info="指揮官情報（顔アイコン）＞強化情報＞戦闘準備強化">i</span></label>
@@ -236,10 +759,14 @@
         </div>
 
         <div class="section">
-          <div class="sectionTitle"><span class="step">2</span>戦後回復ブーストの入力or計算</div>
-
+          <div class="sectionTitle"><span class="step">2</span>戦後回復ブーストの入力 or 計算</div>
+          <div class="hint" style="margin-top:8px; font-size:14px; font-weight:900;">※戦後回復ブーストは下記（荒野の王イベントページ）から確認できます</div>
+          <div class="img-row" style="margin-top:10px;">
+            <img class="shot" src="images/07.png" alt="戦後回復ブースト確認手順1" />
+            <img class="shot" src="images/08.png" alt="戦後回復ブースト確認手順2" />
+          </div>
           <div class="radioRow" style="margin-top:10px;">
-            <label class="radio"><input type="radio" name="boostInputMode" id="boostModeManual" value="manual">戦後回復ブーストを入力する【※終了後限定】</label>
+            <label class="radio"><input type="radio" name="boostInputMode" id="boostModeManual" value="manual">戦後回復ブーストを入力する【攻撃終了後のみ】</label>
             <label class="radio"><input type="radio" name="boostInputMode" id="boostModeCharge" value="charge" checked>突撃する兵士の情報から算出する</label>
           </div>
 
@@ -293,14 +820,14 @@
           <div id="trainBlocks"></div>
 
           <button class="toggle" id="addTrainBlock" type="button">＋追加する</button>
-          <button class="actionBtn" id="equalAlloc" type="button">入力した訓練兵士を均等に作る<span class="infoMark" data-info="バフで作れる分の兵士を均等に割ります">i</span></button>
+          <button class="actionBtn" id="equalAlloc" type="button">入力した兵士を均等な数ずつ作る<span class="infoMark" data-info="バフで作れる分の兵士を均等に割ります">i</span></button>
         </div>
 
         <div class="section">
           <div class="sectionTitle"><span class="step">4</span>結果</div>
           <div class="results" style="margin-top:10px;">
             <div class="kpi">
-              <div class="name">必要なブースト（合計）</div>
+              <div class="name">必要なブースト（合計）（※戦後回復ブーストのバフ300％＋国バフ30％を含む）</div>
               <div class="value"><span id="outNeedBoost">-</span></div>
             </div>
             <div class="kpi">
@@ -399,7 +926,9 @@
 
   // 係数（0.7＋②×0.003）
   function factorFromRate(aftershockRatePercent) {
-    return 0.7 + (aftershockRatePercent * 0.003);
+    const rescue = document.getElementById("battleRescue");
+    const extra = (rescue && rescue.checked) ? 0.09 : 0;
+    return 0.7 + (aftershockRatePercent * 0.003) + extra;
   }
 
   // Aの推奨上限：①÷（0.7＋②×0.003）
@@ -503,6 +1032,7 @@
 
     const mode = $("mode").value;
     show($("sectionA"), ok1 && mode === "A");
+    show($("modeANote"), ok1 && mode === "A");
     show($("sectionB"), ok1 && mode === "B");
 
     if (!(ok1 && mode === "B")) {
@@ -529,6 +1059,7 @@
     const rate = num($("aftershockRate").value);
     if (!Number.isFinite(cap) || !Number.isFinite(rate)) {
       $("aMaxSafe").textContent = "-";
+      if ($("aDeepCount")) $("aDeepCount").textContent = "-";
       if ($("aTotalPoints")) $("aTotalPoints").textContent = "-";
       $("aTotalSoldiers").textContent = "-";
       setWarn("aWarn", "");
@@ -550,6 +1081,10 @@
     });
 
     $("aTotalSoldiers").textContent = fmt(totalSoldiers);
+    if ($("aDeepCount")) {
+      const deep = Math.floor(totalSoldiers * factorFromRate(rate));
+      $("aDeepCount").textContent = fmt(deep);
+    }
     // 表の右下（筆算）に、死亡数ポイント合計
     if ($("aTotalPointsInline")) $("aTotalPointsInline").textContent = fmt(totalPoints);
     // KPI側に、死亡数ポイント報酬の「実ポイント（目安）」
@@ -585,6 +1120,7 @@
       $("bNeedPoints").textContent = "-";
       $("bMainSoldiers").textContent = "-";
       $("bSubSoldiers").textContent = "-";
+      if ($("bDeepCount")) $("bDeepCount").textContent = "-";
       $("bSubCard").classList.add("hidden");
       setWarn("bWarn", "");
       lastNeedDeathDelta = 0;
@@ -608,6 +1144,7 @@
     const irregularOn = !$("irregularBox").classList.contains("hidden");
     if (!irregularOn){
       $("bMainSoldiers").textContent = fmt(mainNeed);
+      if ($("bDeepCount")) $("bDeepCount").textContent = fmt(Math.floor(mainNeed * factor));
       $("bSubCard").classList.add("hidden"); // ←サブは非表示
       setWarn("bWarn", buildHospitalWarn(mainNeed, cap, factor));
     } else {
@@ -650,6 +1187,10 @@
 
     $("bMainSoldiers").textContent = fmt(mainCount);
     $("bSubSoldiers").textContent = fmt(subNeed);
+    if ($("bDeepCount")) {
+      const totalAtk = num($("mainCountManual").value,0) + num($("subCount").value,0);
+      $("bDeepCount").textContent = fmt(Math.floor(totalAtk * factorFromRate(num($("aftershockRate").value))));
+    }
 
     const warn = (Number.isFinite(cap) && Number.isFinite(total) && Number.isFinite(factor) && (total * factor) > cap)
       ? buildHospitalWarn(total, cap, factor) : "";
@@ -667,7 +1208,13 @@
   // Toggle irregular
   $("toggleIrregular").addEventListener("click", () => {
     const box = $("irregularBox");
+    const inputs = $("irregularInputs");
     box.classList.toggle("hidden");
+    // サブ入力欄も同じ条件で表示/非表示
+    if (inputs) {
+      if (box.classList.contains("hidden")) inputs.classList.add("hidden");
+      else inputs.classList.remove("hidden");
+    }
     if (box.classList.contains("hidden")) {
       $("bSubCard").classList.add("hidden");
       setWarn("iWarn", "");
@@ -687,6 +1234,9 @@
   $("hospitalCap").addEventListener("input", () => { updateStepVisibility(); updateA(); updateB(); });
   $("aftershockRate").addEventListener("input", () => { updateStepVisibility(); updateA(); updateB(); });
   $("mode").addEventListener("change", onModeChange);
+
+  const br = $("battleRescue");
+  if (br) br.addEventListener("change", () => { updateA(); updateB(); });
 
   $("targetPoints").addEventListener("input", updateB);
   $("currentRealPoints").addEventListener("input", updateB);
@@ -746,6 +1296,14 @@
   };
 
   const trainBlocksEl = document.getElementById("trainBlocks");
+  // 配分(%)を変更したら、残りを自動で調整して合計100にする
+  trainBlocksEl.addEventListener("input", (e)=>{
+    const t = e.target;
+    if(t && t.classList && t.classList.contains("alloc")){
+      autoBalanceAlloc(t);
+    }
+  });
+
   const charge2Wrap = document.getElementById("charge2Wrap");
 
   function fillTier(sel){
@@ -897,6 +1455,52 @@
     if(sum===0 && forceFix){
       blocks[0].querySelector(".alloc").value="100";
     }
+
+  function autoBalanceAlloc(changedEl){
+    const blocks = Array.from(trainBlocksEl.querySelectorAll(".trainBlock"));
+    if(blocks.length === 0) return;
+    if(blocks.length === 1){
+      blocks[0].querySelector(".alloc").value = "100";
+      return;
+    }
+
+    const changedBlock = changedEl.closest(".trainBlock");
+    if(!changedBlock) return;
+
+    let changed = Number(changedEl.value);
+    if(!Number.isFinite(changed)) changed = 0;
+    changed = Math.max(0, Math.min(100, Math.round(changed)));
+    changedEl.value = String(changed);
+
+    const others = blocks.filter(b => b !== changedBlock);
+    const remaining = Math.max(0, 100 - changed);
+
+    let sumOthers = 0;
+    const cur = others.map(b => {
+      const el = b.querySelector(".alloc");
+      let v = Number(el.value);
+      if(!Number.isFinite(v)) v = 0;
+      v = Math.max(0, Math.round(v));
+      sumOthers += v;
+      return {el, v};
+    });
+
+    if(sumOthers === 0){
+      cur.forEach((o, idx)=> o.el.value = String(idx === 0 ? remaining : 0));
+      return;
+    }
+
+    let assigned = 0;
+    cur.forEach((o, idx)=>{
+      if(idx === cur.length - 1) return;
+      const nv = Math.floor(o.v / sumOthers * remaining);
+      o.el.value = String(nv);
+      assigned += nv;
+    });
+    const last = cur[cur.length - 1];
+    last.el.value = String(Math.max(0, remaining - assigned));
+  }
+
   }
 
   function addTrain(){
@@ -950,6 +1554,8 @@
   function calcBoost(){
     const speed = Math.max(0, Number(document.getElementById("trainSpeed").value)||0);
     const costDown = Math.max(0, Number(document.getElementById("trainCostDown").value)||0);
+    // このサイトの仕様：ブースト計算では常に訓練速度 +330%
+    const effSpeed = speed + 330;
 
     // Determine B (death boost points)
     let B = 0;
@@ -989,7 +1595,7 @@
 
       const {v, d} = perOneCA(tier, ug);
       const m = v>0 ? Math.ceil(Bi / v) : 0;
-      const sec = (m*d) / (1 + speed/100);
+      const sec = (m*d) / (1 + effSpeed/100);
       totalSec += sec;
 
       const r = perOneRes(tier, ug, type);
@@ -1000,18 +1606,28 @@
         const steelNo= toM2(r[2]*m);
         const gasNo  = toM2(r[3]*m);
 
+        
         const factor = 1 - costDown/100;
-        food = toM2(r[0]*m*factor);
-        wood = toM2(r[1]*m*factor);
-        steel= toM2(r[2]*m*factor);
-        gas  = toM2(r[3]*m*factor);
+        const consumeFactor = factor * 0.75; // 消費ダウン(-25%)
 
-        sumFoodNo += foodNo; sumWoodNo += woodNo; sumSteelNo += steelNo; sumGasNo += gasNo;
+        // 集計：なし=訓練コストダウンのみ / あり=さらに消費ダウン(-25%)
+        const foodBase = toM2(r[0]*m*factor);
+        const woodBase = toM2(r[1]*m*factor);
+        const steelBase= toM2(r[2]*m*factor);
+        const gasBase  = toM2(r[3]*m*factor);
+
+        // （行表示に使う値：あり側）
+        food = toM2(r[0]*m*consumeFactor);
+        wood = toM2(r[1]*m*consumeFactor);
+        steel= toM2(r[2]*m*consumeFactor);
+        gas  = toM2(r[3]*m*consumeFactor);
+
+        sumFoodNo += foodBase; sumWoodNo += woodBase; sumSteelNo += steelBase; sumGasNo += gasBase;
         sumFoodYes += food; sumWoodYes += wood; sumSteelYes += steel; sumGasYes += gas;
-      }
+}
 
       const fullType = ["ファイター","シューター","ライダー","車両"][type] || "";
-      const label = `T${tier} / ${fullType}${useUg?`（UG元:T${ug}）`:""}`;
+      const label = `T${tier}/${fullType}${useUg?"（アップグレード）":""}`;
       const tr=document.createElement("tr");
       tr.innerHTML = `
         <td style="text-align:left">${label}</td>
@@ -1040,7 +1656,7 @@
         // show only if any charge input
         const cn1 = Math.max(0, Number(document.getElementById("chargeNum1").value)||0);
         const cn2 = charge2Wrap.classList.contains("hidden") ? 0 : Math.max(0, Number(document.getElementById("chargeNum2").value)||0);
-        const msg = (cn1||cn2) ? `突撃から算出: ${(B||0).toLocaleString("ja-JP")} pt` : "";
+        const msg = (cn1||cn2) ? `突撃から算出した戦後回復ブースト： ${(B||0).toLocaleString("ja-JP")} pt` : "";
         info.textContent = msg;
         info.classList.toggle("show", !!msg);
       }
@@ -1135,5 +1751,15 @@
   });
 
 </script>
+
+  <div class="footer-wrap">
+    <footer class="footerText" style="margin-top:14px">
+      本ページは、閲覧者が個人的に計算を行う目的に限り利用できます。<br/>
+      作者morocoshiwataroに許可なく本URLを第三者に渡すことはできる限りお控えください。<br/>
+      本ページは予告なく閉鎖する可能性があります。<br/>
+      何かあればmorocoshiwatro(R@R)まで気軽にDMいただければと思います！
+    </footer>
+  </div>
+
 </body>
 </html>
