@@ -1348,3 +1348,17 @@ img{
 
 /* === Takarabako: avoid preserved newlines in structured rows === */
 .pageTakarabako .opinionMain{ white-space: normal; }
+
+/* ===== Card grid (generic) ===== */
+.suggestionGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+@media (min-width: 720px){
+  .suggestionGrid{ grid-template-columns: 1fr 1fr; }
+}
+
+/* ===== Filter spacing ===== */
+.filterBar{ margin-bottom: 14px; }
