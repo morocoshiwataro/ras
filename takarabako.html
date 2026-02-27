@@ -36,15 +36,15 @@
       <div class="wishFilters" role="search">
         <div class="wishFilterItem">
           <label class="wishFilterLabel" for="filterName">名前</label>
-          <input id="filterName" type="text" placeholder="例：moko / 匿名 など" />
+          <input id="filterName" type="text" placeholder="例：ウポツ / しげじゅん / 匿名 など" />
         </div>
         <div class="wishFilterItem">
-          <label class="wishFilterLabel" for="filterType">希望種</label>
+          <label class="wishFilterLabel" for="filterType">第一希望</label>
           <select id="filterType">
             <option value="">すべて</option>
           </select>
         </div>
-        <button id="filterClear" class="actionBtn" type="button">条件をクリア</button>
+        <button id="filterClear" class="actionBtn" type="button">条件をクリア（全員表示）</button>
       </div>
 
       <div id="wishList" class="wishGrid" aria-live="polite">読み込み中…</div>
@@ -184,7 +184,7 @@
           <div class="wishRow"><span class="wishLabel">第3希望</span><span class="wishVal">${escapeHtml(it.w3 || "—")}</span></div>
         </div>
 
-        ${it.type ? `<div class="wishType">希望種：<b>${escapeHtml(it.type)}</b></div>` : ``}
+        ${it.type ? `<div class="wishType">第一希望：<b>${escapeHtml(it.type)}</b></div>` : ``}
       `;
       el.appendChild(card);
     }
@@ -255,7 +255,7 @@
         const w2 = stripParen(pick(obj, ["第2希望", "第二希望", "第２希望", "2nd", "希望2", "希望２"]));
         const w3 = stripParen(pick(obj, ["第3希望", "第三希望", "第３希望", "3rd", "希望3", "希望３"]));
 
-        const type = stripParen(pick(obj, ["希望種", "希望の種類", "種類", "タイプ", "種別"]));
+        const type = stripParen(pick(obj, ["第一希望", "希望の種類", "種類", "タイプ", "種別"]));
 
         return {
           time: t.raw,
