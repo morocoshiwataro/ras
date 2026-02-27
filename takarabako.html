@@ -12,23 +12,10 @@
 
     <header>
       <h1>宝箱の希望</h1>
-      <div class="sub">欲しい宝箱の希望を登録できます。名前は任意です（同じ名前の投稿は最新のみ表示）。</div>
-    </header>
+</header>
 
     <main class="card">
-      <div class="headingBig">🎁 希望フォーム</div>
-      <div class="embedBox">
-        <iframe
-          title="宝箱の希望フォーム"
-          src="https://docs.google.com/forms/d/e/1FAIpQLSc5nlOMWkG61ha2Or5G_fqOi5q4jm-cfmzTgWYgjkzqAbg7Jw/viewform?embedded=true"
-          width="100%"
-          height="920"
-          frameborder="0"
-          marginheight="0"
-          marginwidth="0">読み込んでいます…</iframe>
-      </div>
-
-      <div class="sectionDivider" aria-hidden="true"></div>
+<div class="sectionDivider" aria-hidden="true"></div>
 
       <div class="headingBig">🔎 希望一覧</div>
       <div class="sub" style="margin-top:-4px;">反映まで少し時間がかかる場合があります。</div>
@@ -36,7 +23,7 @@
       <div class="wishFilters" role="search">
         <div class="wishFilterItem">
           <label class="wishFilterLabel" for="filterName">名前</label>
-          <input id="filterName" type="text" placeholder="例：ウポツ / しげじゅん / 匿名 など" />
+          <input id="filterName" type="text" placeholder="例：ウポツ / しげじゅん など" />
         </div>
         <div class="wishFilterItem">
           <label class="wishFilterLabel" for="filterType">第一希望</label>
@@ -168,7 +155,7 @@
 
     el.innerHTML = "";
     for (const it of items){
-      const name = it.name || "匿名";
+      const name = it.name || "";
 
       const card = document.createElement("div");
       card.className = "wishCard";

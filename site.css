@@ -1247,3 +1247,7 @@ img{
   line-height: 1.7;
   font-size: 14px;
 }
+
+
+/* === Force emph underline to display === */
+.emph{ text-decoration-line: underline !important; text-decoration-color: var(--accent) !important; }
