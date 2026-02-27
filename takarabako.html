@@ -6,13 +6,13 @@
   <title>宝箱の希望 | 【ras】鯛せんべい用：まとめサイト</title>
   <link rel="stylesheet" href="site.css">
 </head>
-<body class="pageTakarabako">
+<body>
   <div class="wrap">
     <div class="siteHeader"><a href="home.html">【ras】鯛せんべい用：まとめサイト</a></div>
 
     <header>
       <h1>宝箱の希望</h1>
-</header>
+    </header>
 
     <main class="card">
 
@@ -21,14 +21,16 @@
         <iframe
           title="宝箱の希望フォーム"
           src="https://docs.google.com/forms/d/e/1FAIpQLSc5nlOMWkG61ha2Or5G_fqOi5q4jm-cfmzTgWYgjkzqAbg7Jw/viewform?embedded=true"
+          width="100%"
           height="920"
+          frameborder="0"
           marginheight="0"
           marginwidth="0">読み込んでいます…</iframe>
       </div>
 
       <div class="sectionDivider" aria-hidden="true"></div>
 
-      <div class="headingBig">📋 最新の提出内容</div>
+      <div class="headingBig">最新の提出内容</div>
 
       <div class="filterBar" aria-label="絞り込み">
         <div class="field">
@@ -47,18 +49,19 @@
         </div>
       </div>
 
-      <div id="wishList" class="opinionGrid" aria-live="polite">読み込み中…</div>
+      <div id="wishList" class="suggestionGrid" aria-live="polite">読み込み中…</div>
     </main>
 
     <footer>
-      <b>備考：</b>希望内容の表記はフォーム回答を元に表示しています。
+      <b>備考：</b>同じ名前で複数回答がある場合、最新の提出内容のみ表示します。
     </footer>
   </div>
 
 <script>
 (function(){
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgUYR3CVxvTefgCXYgkqJvXzRtACMLCA2tJm-xFXr6wPL5hJSVs-EO2d_jQvGB2ZMnC3k1KPlLq7TB/pub?output=csv";
+  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgUYR3CVxvTefgCXYgkqJvXzRtACMLCA2tJm-xFXr6wPL5hJSVs-EO2d_jQvGB2ZMnC3k1KPlLq7TB/pub?output=csv';
 
+  // CSV parser (handles quotes/newlines/commas)
   function parseCSV(text){
     const rows = [];
     let row = [];
@@ -70,20 +73,12 @@
       const n = text[i+1];
 
       if (c === '"') {
-        if (inQuotes && n === '"') {
-          cur += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
+        if (inQuotes && n === '"') { cur += '"'; i++; }
+        else { inQuotes = !inQuotes; }
         continue;
       }
 
-      if (!inQuotes && c === ',') {
-        row.push(cur);
-        cur = "";
-        continue;
-      }
+      if (!inQuotes && c === ',') { row.push(cur); cur = ""; continue; }
 
       if (!inQuotes && (c === '\n' || c === '\r')) {
         if (c === '\r' && n === '\n') i++;
@@ -139,54 +134,58 @@
     }[m]));
   }
 
-  function render(rows){
-    const list = document.getElementById("wishList");
-    const nameInput = document.getElementById("nameFilter");
-    const firstSel = document.getElementById("firstFilter");
-    const clearBtn = document.getElementById("clearBtn");
-
-    function applyFilter(){
-      const nameQ = normalize(nameInput.value).toLowerCase();
-      const firstQ = firstSel.value;
-
-      const filtered = rows.filter(r => {
-        const nameOk = !nameQ || (r.name||"").toLowerCase().includes(nameQ);
-        const firstOk = !firstQ || r.c1 === firstQ; // 第一希望のみ
-        return nameOk && firstOk;
-      });
-
-      if (!filtered.length){
-        list.textContent = "条件に一致する結果がありません。";
-        return;
-      }
-
-      list.innerHTML = "";
-      filtered.forEach(r => {
-        const card = document.createElement("div");
-        card.className = "opinionCard";
-        card.innerHTML = `<div class="opinionMain"><div><b>第一希望：</b> ${escapeHtml(r.c1 || "—")}</div><div><b>第二希望：</b> ${escapeHtml(r.c2 || "—")}</div><div><b>第三希望：</b> ${escapeHtml(r.c3 || "—")}</div></div><div class="opinionMeta"><span class="opinionName">${escapeHtml(r.name || "—")}</span><span>${escapeHtml(r.dateOnly || "")}</span></div>`;
-        list.appendChild(card);(card);
-      });
-    }
-
-    nameInput.addEventListener("input", applyFilter);
-    firstSel.addEventListener("change", applyFilter);
-    clearBtn.addEventListener("click", () => {
-      nameInput.value = "";
-      firstSel.value = "";
-      applyFilter();
-    });
-
-    const opts = Array.from(new Set(rows.map(r => r.c1).filter(Boolean)));
+  function fillFirstOptions(rows){
+    const sel = document.getElementById("firstFilter");
+    const opts = Array.from(new Set(rows.map(r => r.w1).filter(Boolean)));
     opts.sort((a,b) => a.localeCompare(b,'ja'));
-    opts.forEach(v => {
+    for (const v of opts){
       const o = document.createElement("option");
       o.value = v;
       o.textContent = v;
-      firstSel.appendChild(o);
+      sel.appendChild(o);
+    }
+  }
+
+  function render(items){
+    const el = document.getElementById("wishList");
+    if (!el) return;
+
+    if (!items.length){
+      el.innerHTML = '<div class="opinionEmpty">該当する希望がありません。</div>';
+      return;
+    }
+
+    el.innerHTML = "";
+    for (const it of items){
+      const card = document.createElement("div");
+      card.className = "wishCard";
+      card.innerHTML = `
+        <div class="wishHead">
+          <div class="wishName">👤 ${escapeHtml(it.name || "")}</div>
+          ${it.date ? `<div class="wishTime">${escapeHtml(it.date)}</div>` : ``}
+        </div>
+
+        <div class="wishRows">
+          <div class="wishRow"><span class="wishLabel">第1希望</span><span class="wishVal">${escapeHtml(it.w1 || "—")}</span></div>
+          <div class="wishRow"><span class="wishLabel">第2希望</span><span class="wishVal">${escapeHtml(it.w2 || "—")}</span></div>
+          <div class="wishRow"><span class="wishLabel">第3希望</span><span class="wishVal">${escapeHtml(it.w3 || "—")}</span></div>
+        </div>
+      `;
+      el.appendChild(card);
+    }
+  }
+
+  function applyFilters(all){
+    const nameQ = normalize(document.getElementById("nameFilter").value).toLowerCase();
+    const firstQ = document.getElementById("firstFilter").value;
+
+    const filtered = all.filter(it => {
+      const nameOk = !nameQ || (it.name||"").toLowerCase().includes(nameQ);
+      const firstOk = !firstQ || it.w1 === firstQ; // 第一希望のみで絞り込み
+      return nameOk && firstOk;
     });
 
-    applyFilter();
+    render(filtered);
   }
 
   fetch(CSV_URL)
@@ -198,23 +197,24 @@
 
       const idxTS = pickHeaderIndex(headers, ["タイムスタンプ","timestamp"]);
       const idxName = pickHeaderIndex(headers, ["名前","name"]);
-      const idxC1 = pickHeaderIndex(headers, ["第1希望","第１希望","第一希望","first"]);
-      const idxC2 = pickHeaderIndex(headers, ["第2希望","第２希望","第二希望","second"]);
-      const idxC3 = pickHeaderIndex(headers, ["第3希望","第３希望","第三希望","third"]);
+      const idxW1 = pickHeaderIndex(headers, ["第1希望","第１希望","第一希望","first"]);
+      const idxW2 = pickHeaderIndex(headers, ["第2希望","第２希望","第二希望","second"]);
+      const idxW3 = pickHeaderIndex(headers, ["第3希望","第３希望","第三希望","third"]);
 
       const mapped = body.map(cols => {
         const ts = idxTS >= 0 ? (cols[idxTS]||"") : "";
         const d = parseDate(ts);
         return {
           tsDate: d || new Date(0),
-          dateOnly: toDateOnly(d),
+          date: toDateOnly(d),
           name: normalize(idxName>=0 ? cols[idxName] : ""),
-          c1: stripParen(idxC1>=0 ? cols[idxC1] : ""),
-          c2: stripParen(idxC2>=0 ? cols[idxC2] : ""),
-          c3: stripParen(idxC3>=0 ? cols[idxC3] : "")
+          w1: stripParen(idxW1>=0 ? cols[idxW1] : ""),
+          w2: stripParen(idxW2>=0 ? cols[idxW2] : ""),
+          w3: stripParen(idxW3>=0 ? cols[idxW3] : "")
         };
       }).filter(r => r.name);
 
+      // same name -> latest only
       const byName = new Map();
       mapped.forEach(r => {
         const key = r.name.toLowerCase();
@@ -222,11 +222,22 @@
         if (!prev || r.tsDate > prev.tsDate) byName.set(key, r);
       });
 
-      const rows = Array.from(byName.values()).sort((a,b) => b.tsDate - a.tsDate);
-      render(rows);
+      const all = Array.from(byName.values()).sort((a,b) => b.tsDate - a.tsDate);
+
+      fillFirstOptions(all);
+      applyFilters(all);
+
+      document.getElementById("nameFilter").addEventListener("input", () => applyFilters(all));
+      document.getElementById("firstFilter").addEventListener("change", () => applyFilters(all));
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        document.getElementById("nameFilter").value = "";
+        document.getElementById("firstFilter").value = "";
+        applyFilters(all);
+      });
     })
     .catch(() => {
-      document.getElementById("wishList").textContent = "表示できませんでした。";
+      const el = document.getElementById("wishList");
+      if (el) el.textContent = "表示できませんでした。";
     });
 })();
 </script>
