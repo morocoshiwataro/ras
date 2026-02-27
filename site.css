@@ -718,3 +718,350 @@
   box-shadow: none !important;
   padding: 0 !important;
 }
+
+
+/* ===== Today items section ===== */
+.todaySubDivider{
+  height: 1px;
+  background: rgba(255,255,255,.18);
+  margin: 10px 0;
+  border-radius: 999px;
+}
+.todayItemsTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 950;
+  color: rgba(255,255,255,.92);
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.todayItemsBody{
+  color: rgba(255,255,255,.86);
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+
+/* ===== Reward pills inside event cards ===== */
+.rewardPills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top: 6px;
+}
+.rewardPill{
+  display:inline-flex;
+  align-items:center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(199,154,75,.30);
+  background: rgba(199,154,75,.12);
+  color: rgba(255,242,220,.92);
+}
+
+/* ===== Today items pills (different from week/day pills) ===== */
+.todayItemsTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 950; /* match 今日のイベント */
+  color: rgba(255,255,255,.94);
+  margin: 0 0 6px;
+}
+.todayItemsPills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin: 0;
+}
+.todayItemPill{
+  display:inline-flex;
+  align-items:center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(210, 170, 80, .35);
+  background: rgba(210, 170, 80, .18);
+  color: rgba(255, 240, 210, .95);
+}
+.todayItemPill.isEmpty{
+  border-color: rgba(255,255,255,.16);
+  background: rgba(0,0,0,.18);
+  color: rgba(255,255,255,.78);
+}
+
+/* =========================
+   Event page additions
+   ========================= */
+
+/* reward pills (home/event cards) */
+.rewardPills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top: 8px;
+}
+.rewardPill{
+  display:inline-flex;
+  align-items:center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(199,154,75,.30);
+  background: rgba(199,154,75,.14);
+  color: rgba(255,242,220,.94);
+}
+
+/* hero header image area */
+.hero{
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  min-height: 150px;
+  background:
+    radial-gradient(1200px 240px at 30% 20%, rgba(255,255,255,.10), rgba(255,255,255,0) 60%),
+    linear-gradient(135deg, rgba(80,50,20,.95), rgba(20,14,8,.92));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 18px 44px rgba(0,0,0,.28);
+}
+.heroOverlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding: 16px 16px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0) 65%);
+}
+.heroTitleRow{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+}
+.heroTitle{
+  margin:0;
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.96);
+  text-shadow: 0 10px 22px rgba(0,0,0,.45);
+}
+.heroPills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+/* pills (shared) */
+.pill{
+  display:inline-flex;
+  align-items:center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.18);
+  color: rgba(255,255,255,.88);
+}
+.pillSolid{
+  border-color: rgba(255,255,255,.22);
+  background: rgba(0,0,0,.26);
+  color: rgba(255,255,255,.92);
+}
+
+@media (max-width: 520px){
+  .heroTitleRow{ flex-direction:column; align-items:flex-start; }
+  .heroPills{ margin-top: 10px; }
+  .heroTitle{ font-size: 20px; }
+}
+
+/* figure / images in content */
+.figure{ margin: 14px 0 18px; }
+.figure img{
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  display:block;
+  margin: 0 auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 18px 44px rgba(0,0,0,.22);
+}
+.figure figcaption{
+  margin-top: 8px;
+  text-align:center;
+  font-size: 12px;
+  color: rgba(255,255,255,.72);
+}
+
+/* summary (cream, yellow border, check icon) */
+.summary{
+  background: rgba(255, 248, 235, .92);
+  border: 1px solid rgba(210,170,80,.55);
+  box-shadow: 0 14px 34px rgba(0,0,0,.18);
+}
+.summaryTitle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight: 950;
+  font-size: 15px;
+  color: rgba(40,30,20,.96);
+  margin-bottom: 8px;
+}
+.summaryTitle::before{
+  content: "✔";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(210,170,80,.85);
+  color: #1a1206;
+  font-size: 12px;
+  font-weight: 900;
+}
+.summaryBody{
+  color: rgba(30,30,30,.92);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+/* summary bullets: tighten dot spacing */
+.summaryBody ul{
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.summaryBody li{
+  position: relative;
+  padding-left: 1.1em;
+  margin: 6px 0;
+}
+.summaryBody li::before{
+  content: "・";
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  color: rgba(40,30,20,.72);
+}
+
+/* marker emphasis */
+.markerEmph{
+  position: relative;
+  font-weight: 950;
+  color: rgba(25,18,12,.96);
+  padding: 0 .06em;
+  white-space: nowrap;
+}
+.markerEmph::after{
+  content:"";
+  position:absolute;
+  left:-2px;
+  right:-2px;
+  bottom: .08em;
+  height: .62em;
+  border-radius: 8px;
+  background: rgba(210,170,80,.88); /* yellow (same family as check) */
+  z-index: -1;
+  transform: rotate(-1deg);
+}
+.markerStrong{
+  position: relative;
+  font-weight: 950;
+  color: rgba(255,255,255,.96);
+  padding: 0 .06em;
+  white-space: nowrap;
+}
+.markerStrong::after{
+  content:"";
+  position:absolute;
+  left:-2px;
+  right:-2px;
+  bottom: .08em;
+  height: .62em;
+  border-radius: 8px;
+  background: rgba(40, 140, 90, .78);
+  z-index: -1;
+  transform: rotate(-1deg);
+}
+.emph{ text-decoration: none !important; }
+
+/* supplement (green) */
+.supplement{
+  margin-top: 14px;
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(140, 200, 120, .35);
+  background: rgba(140, 200, 120, .14);
+  box-shadow: 0 16px 40px rgba(0,0,0,.18);
+}
+.supplementTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 950;
+  color: rgba(235,255,235,.96);
+  margin-bottom: 6px;
+}
+.supplementBody{
+  color: rgba(255,255,255,.86);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.supplement .info{
+  color: rgba(170, 235, 170, .95);
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
+}
+
+/* stop SVG icon explosion */
+.notice .tri,
+.supplement .info,
+svg.info, svg.tri{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+}
+
+/* global media safety: images never overflow */
+img{
+  max-width: 100%;
+  height: auto;
+}
+/* === Patch: wkまとめの微調整（最小差分） === */
+
+/* 1) まとめ内「目標ポイント」のマーカーを黄色に（チェックと同系色） */
+.markerEmph::after{
+  background: rgba(210,170,80,.90) !important;
+}
+
+/* 2) まとめの箇条書き「・」右側の余白を詰める */
+.summaryBody ul{
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.summaryBody li{
+  position: relative;
+  padding-left: 1.2em; /* ← ここで「・」〜本文の距離を制御 */
+  margin: 6px 0;
+}
+.summaryBody li::before{
+  content: "・";
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  color: rgba(40,30,20,.75);
+}
