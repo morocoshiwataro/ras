@@ -1251,3 +1251,96 @@ img{
 
 /* === Force emph underline to display === */
 .emph{ text-decoration-line: underline !important; text-decoration-color: var(--accent) !important; }
+
+
+/* === Marker-style emphasis (bold + highlight) === */
+.emph{
+  font-weight: 950 !important;
+  text-decoration: none !important;
+  background-image: linear-gradient(transparent 62%, rgba(199,154,75,.38) 62%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: 0 .12em;
+  border-radius: 6px;
+}
+
+/* ===== Embedded Google Form box ===== */
+.embedBox{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0,0,0,.12);
+}
+.embedBox iframe{
+  display:block;
+  width: 100%;
+  border: 0;
+}
+
+/* ===== Opinion / wish cards grid ===== */
+.opinionGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+@media (min-width: 720px){
+  .opinionGrid{ grid-template-columns: 1fr 1fr; }
+}
+.opinionCard{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+  padding: 12px 12px;
+}
+.opinionMain{
+  font-size: 14px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.92);
+  white-space: pre-wrap;
+}
+.opinionMeta{
+  margin-top: 10px;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  color: rgba(255,255,255,.60);
+  font-size: 12px;
+}
+.opinionName{
+  font-weight: 900;
+  color: rgba(255,255,255,.80);
+}
+
+/* ===== Filters ===== */
+.filterBar{
+  margin-top: 10px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 720px){
+  .filterBar{ grid-template-columns: 1.2fr 1fr 220px; align-items:end; }
+}
+.filterBar .field label{
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255,255,255,.75);
+}
+.filterBar input, .filterBar select{
+  width:100%;
+}
+.clearBtn{
+  width:100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(199,154,75,.30);
+  background: rgba(199,154,75,.12);
+  color: #ffe7be;
+  font-weight: 950;
+  cursor: pointer;
+}
+.clearBtn:hover{ background: rgba(199,154,75,.16); }
