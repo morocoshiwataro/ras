@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Puzzle & Survival ギルド共有</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="siteHeader"><a href="home.html">【ras】鯛せんべい用：まとめサイト</a></div>
+
+    <header>
+      <a class="menuTopBtn" href="meyasubako.html">
+        <span class="menuTopIcon" aria-hidden="true">📮</span>
+        <span class="menuTopTextWrap">
+          <span class="menuTopText">目安箱</span>
+          <span class="menuTopSub">ご意見・ご提案はこちら</span>
+        </span>
+      </a>
+<div class="todayBanner" id="todayBanner" aria-live="polite">
+  <div class="todayBannerTitle">
+    <span>📣 今日のイベント</span>
+    <span class="todayTags">
+      <span class="todayTag" id="todayTagWeek">—</span>
+      <span class="todayTag" id="todayTagDay">—</span>
+    </span>
+  </div>
+  <p class="todayBannerBody" id="todayBannerBody">読み込み中…</p>
+    <div class="todaySubDivider" aria-hidden="true"></div>
+    <div class="todayItemsTitle">🎁 受け取り・使用推奨アイテム</div>
+    <div class="todayItemsPills" id="todayItemsBody">読み込み中…</div>
+</div>
+
+<script>
+  (function () {
+    // ===== 設定（ローテーションの基準）=====
+    // 「エスコマ週」と「通常週」は完全に交互。現在（この週）はエスコマ週、という前提で基準日を置いています。
+    // 必要なら、この日付だけ変更してください（基準の週の“月曜日”推奨）。
+    const ANCHOR_MONDAY = new Date(Date.UTC(2026, 0, 20)); // 2026-01-20 をエスコマ週の基準にする（※月曜始まりで扱う）
+
+    // 金曜の★ローテ（3週サイクル）。今週は「氷原の戦い」からスタート。
+    const FRIDAY_ROTATION = [
+      "氷原の戦い（21:00～）",
+      "ギルド大乱闘（21:00～）",
+      "浄水争奪戦（21:00～）"
+    ];
+
+    // ===== 今日の「🎁受け取り・使用推奨アイテム」 =====
+    // 書き方：全角スペース「　」で区切ると箇条書き表示になります。
+    const ITEMS_ESUKOMA = {
+      1: "英雄（バー・万能の欠片・英雄チョイス・ハッピー大賞）　コロシアムサプライズ補給　ナノウェポン（材料獲得・作成）",
+      2: "",
+      3: "",
+      4: "訓練ブースト",
+      5: "ミュータントPt　メカ　器官強化ルーン",
+      6: "装備　チップ　モジュール　キューブ　物資補給（巣窟でもらえる箱）　守衛戦の報酬　ナノウェポン（作成以外）",
+      0: ""
+    };
+    const ITEMS_NORMAL = {
+      1: "英雄（バー・万能の欠片・英雄チョイス・ハッピー大賞）　コロシアムサプライズ補給",
+      2: "ブースト",
+      3: "装備　収蔵品　結晶核",
+      4: "ミュータントPt　モジュール",
+      5: "グローリー　器官強化ルーン　メカ",
+      6: "ダイヤ",
+      0: "ダイヤ　チップ　キューブ　エンパの報酬"
+    };
+
+    function startOfWeekMondayUTC(d){
+  const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = (x.getUTCDay() + 6) % 7; // Mon=0 ... Sun=6
+  x.setUTCDate(x.getUTCDate() - day);
+  x.setUTCHours(0,0,0,0);
+  return x;
+}
+    function weeksBetween(anchor, d){
+      const ms = 7 * 24 * 60 * 60 * 1000;
+      const diff = startOfWeekMondayUTC(d) - startOfWeekMondayUTC(anchor);
+      return Math.round(diff / ms);
+    }
+
+    const now = new Date();
+      const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      const weekday = today.getUTCDay(); // Sun=0 ... Sat=6
+
+    const weekIndex = weeksBetween(ANCHOR_MONDAY, today);
+    const isEsukomaWeek = (weekIndex % 2 === 0); // 0週目＝エスコマ週
+    const weekLabel = isEsukomaWeek ? "エスコマ週" : "通常週";
+
+    function eventsForToday(){
+      if (weekday === 1){ // 月
+        return [];
+      }
+      if (weekday === 2){ // 火 ※隔週
+        return isEsukomaWeek
+          ? ["ギルドパーティー（21:00～）", "ギルド守衛戦（21:30～）"]
+          : ["ギルドパーティー（21:00～）", "デッドライジング（21:30～）"];
+      }
+      if (weekday === 3){ // 水
+        return ["スピーカートラップ（21:00～）"];
+      }
+      if (weekday === 4){ // 木 ※隔週
+        return isEsukomaWeek
+          ? ["ギルドパーティー（21:00～）", "ギルド守衛戦（21:30～）"]
+          : ["ギルドパーティー（21:00～）", "デッドライジング（21:30～）"];
+      }
+      if (weekday === 5){ // 金 ★3週ローテ
+        const rot = ((weekIndex % 3) + 3) % 3;
+        return [FRIDAY_ROTATION[rot]];
+      }
+      if (weekday === 6){ // 土 ※隔週
+        return isEsukomaWeek ? ["荒野の王（19:00～）"] : ["エンパイアウォー（19:00～）"];
+      }
+      if (weekday === 0){ // 日
+        return ["スピーカートラップ（21:00～）"];
+      }
+      return [];
+    }
+
+    function renderBullets(targetEl, text){
+      if (!targetEl) return;
+      const s = (text || "").trim();
+      if (!s){
+        targetEl.textContent = "（なし）";
+        return;
+      }
+      const parts = s.split("　").map(x => x.trim()).filter(Boolean);
+      if (parts.length <= 1){
+        targetEl.textContent = s;
+        return;
+      }
+      targetEl.innerHTML = parts.map(p => "・" + p).join("<br/>");
+    }
+
+
+function renderPills(targetEl, text, pillClass){
+  if (!targetEl) return;
+  const s = (text || "").trim();
+  if (!s){
+    targetEl.innerHTML = '<span class="' + pillClass + ' isEmpty">（なし）</span>';
+    return;
+  }
+  const parts = s.split("　").map(x => x.trim()).filter(Boolean);
+  targetEl.innerHTML = parts.map(p => '<span class="' + pillClass + '">' + p + '</span>').join("");
+}
+
+    const ev = eventsForToday();
+    const bodyEl = document.getElementById("todayBannerBody");
+    const tagWeekEl = document.getElementById("todayTagWeek");
+    const tagDayEl = document.getElementById("todayTagDay");
+    const itemsEl = document.getElementById("todayItemsBody");
+
+    if (tagWeekEl) tagWeekEl.textContent = weekLabel;
+    if (tagDayEl) tagDayEl.textContent = ["日","月","火","水","木","金","土"][weekday] + "曜日";
+
+    if (bodyEl){
+      if (!ev.length){
+        bodyEl.textContent = "本日のギルドイベントはありません。";
+      } else if (ev.length === 1){
+        bodyEl.textContent = ev[0];
+      } else {
+        bodyEl.innerHTML = ev.map(s => "・" + s).join("<br/>");
+      }
+    }
+
+    const items = (isEsukomaWeek ? ITEMS_ESUKOMA : ITEMS_NORMAL)[weekday] || "";
+    renderPills(itemsEl, items, "todayItemPill");
+})();
+</script>
+</header>
+
+    <main class="card">
+      <div class="headingBig">🛠️ ツール</div>
+      <div class="grid">
+        <a class="linkCard" href="tool-wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E8%A8%88%E7%AE%97%E3%83%84%E3%83%BC%E3%83%AB%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">荒野の王：計算ツール</div>
+          <p class="linkDesc">必要兵士数やポイント計算など。</p>
+        </a>
+              <a class="linkCard" href="meyasubako.html">
+          <div class="linkTitle">目安箱</div>
+          <p class="linkDesc">ご意見・ご提案の投稿と、投稿内容の一覧。</p>
+        </a>
+</div>
+
+      <div class="sectionDivider" aria-hidden="true"></div>
+
+      <div class="headingBig">📝 ギルドのイベント</div>
+      <div class="grid">
+        <a class="linkCard" href="events/wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%AA%AC%E6%98%8E%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">スピーカートラップ</div>
+          <div class="rewardPills"><span class="rewardPill">報酬1</span><span class="rewardPill">報酬2</span><span class="rewardPill">報酬3</span></div>
+        </a>
+        <a class="linkCard" href="events/wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%AA%AC%E6%98%8E%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">デッドライジング</div>
+          <div class="rewardPills"><span class="rewardPill">報酬1</span><span class="rewardPill">報酬2</span><span class="rewardPill">報酬3</span></div>
+        </a>
+        <a class="linkCard" href="events/wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%AA%AC%E6%98%8E%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">浄水争奪戦・ギルド大乱闘</div>
+          <div class="rewardPills"><span class="rewardPill">報酬1</span><span class="rewardPill">報酬2</span><span class="rewardPill">報酬3</span></div>
+        </a>
+        <a class="linkCard" href="events/wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%AA%AC%E6%98%8E%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">氷原の対決</div>
+          <div class="rewardPills"><span class="rewardPill">報酬1</span><span class="rewardPill">報酬2</span><span class="rewardPill">報酬3</span></div>
+        </a>
+        <a class="linkCard" href="events/wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%AA%AC%E6%98%8E%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">ギルド対決</div>
+          <div class="rewardPills"><span class="rewardPill">報酬1</span><span class="rewardPill">報酬2</span><span class="rewardPill">報酬3</span></div>
+        </a>
+
+      </div>
+
+      <div class="sectionDivider" aria-hidden="true"></div>
+
+      <div class="headingBig">📝 国のイベント</div>
+      <div class="grid">
+        <a class="linkCard" href="events/wk.html" style="--bgimg: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27520%27%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c79a4b%27%20stop-opacity%3D%270.40%27/%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23000000%27%20stop-opacity%3D%270.05%27/%3E%0A%20%20%20%20%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%27p%27%20width%3D%2744%27%20height%3D%2744%27%20patternUnits%3D%27userSpaceOnUse%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%27M0%2044%20L44%200%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.12%29%27%20stroke-width%3D%272%27/%3E%0A%20%20%20%20%20%20%20%20%3C/pattern%3E%0A%20%20%20%20%20%20%3C/defs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.04%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23p%29%27/%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27300%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2764%27%20font-weight%3D%27800%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.78%29%27%3E%E4%BB%AE%E7%94%BB%E5%83%8F%3C/text%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2756%27%20y%3D%27372%27%20font-family%3D%27system-ui%2C%20-apple-system%2C%20Segoe%20UI%2C%20Noto%20Sans%20JP%2C%20sans-serif%27%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3D%2736%27%20font-weight%3D%27700%27%20fill%3D%27rgba%28255%2C255%2C255%2C0.58%29%27%3E%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%AA%AC%E6%98%8E%3C/text%3E%0A%20%20%20%20%3C/svg%3E');">
+          <div class="linkTitle">荒野の王（War King）</div>
+          <div class="rewardPills"><span class="rewardPill">報酬1</span><span class="rewardPill">報酬2</span><span class="rewardPill">報酬3</span></div>
+        </a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
