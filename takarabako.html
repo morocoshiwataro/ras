@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>宝箱の希望 | 【ras】鯛せんべい用：まとめサイト</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="siteHeader"><a href="home.html">【ras】鯛せんべい用：まとめサイト</a></div>
+
+    <header>
+      <h1>宝箱の希望</h1>
+      <div class="sub">欲しい宝箱の希望を登録できます。名前は任意です（同じ名前の投稿は最新のみ表示）。</div>
+    </header>
+
+    <main class="card">
+      <div class="headingBig">🎁 希望フォーム</div>
+      <div class="embedBox">
+        <iframe
+          title="宝箱の希望フォーム"
+          src="https://docs.google.com/forms/d/e/1FAIpQLSc5nlOMWkG61ha2Or5G_fqOi5q4jm-cfmzTgWYgjkzqAbg7Jw/viewform?embedded=true"
+          width="100%"
+          height="920"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0">読み込んでいます…</iframe>
+      </div>
+
+      <div class="sectionDivider" aria-hidden="true"></div>
+
+      <div class="headingBig">🔎 希望一覧</div>
+      <div class="sub" style="margin-top:-4px;">反映まで少し時間がかかる場合があります。</div>
+
+      <div class="wishFilters" role="search">
+        <div class="wishFilterItem">
+          <label class="wishFilterLabel" for="filterName">名前</label>
+          <input id="filterName" type="text" placeholder="例：moko / 匿名 など" />
+        </div>
+        <div class="wishFilterItem">
+          <label class="wishFilterLabel" for="filterType">希望種</label>
+          <select id="filterType">
+            <option value="">すべて</option>
+          </select>
+        </div>
+        <button id="filterClear" class="actionBtn" type="button">条件をクリア</button>
+      </div>
+
+      <div id="wishList" class="wishGrid" aria-live="polite">読み込み中…</div>
+    </main>
+
+    <footer>
+      <b>備考：</b>個人情報の書き込みは避けてください。
+    </footer>
+  </div>
+
+<script>
+(function(){
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgUYR3CVxvTefgCXYgkqJvXzRtACMLCA2tJm-xFXr6wPL5hJSVs-EO2d_jQvGB2ZMnC3k1KPlLq7TB/pub?output=csv";
+
+  // CSV parser (handles quotes/newlines/commas)
+  function parseCSV(text){
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++){
+      const c = text[i];
+      const n = text[i+1];
+
+      if (inQuotes){
+        if (c === '"' && n === '"'){
+          cur += '"'; i++;
+        } else if (c === '"'){
+          inQuotes = false;
+        } else {
+          cur += c;
+        }
+        continue;
+      }
+
+      if (c === '"'){ inQuotes = true; continue; }
+      if (c === ','){ row.push(cur); cur = ""; continue; }
+      if (c === '\r'){ continue; }
+      if (c === '\n'){ row.push(cur); rows.push(row); row = []; cur = ""; continue; }
+      cur += c;
+    }
+    row.push(cur);
+    rows.push(row);
+    if (rows.length && rows[rows.length-1].length === 1 && rows[rows.length-1][0] === "") rows.pop();
+    return rows;
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, (m)=>({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function pick(obj, keys){
+    for (const k of keys){
+      if (obj[k] != null && String(obj[k]).trim() !== "") return String(obj[k]).trim();
+    }
+    return "";
+  }
+
+  // remove (...) and （...）
+  function stripParen(s){
+    return String(s ?? "")
+      .replace(/\([^\)]*\)/g, "")
+      .replace(/（[^）]*）/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function parseTime(t){
+    const raw = String(t ?? "").trim();
+    if (!raw) return { raw: "", ms: NaN };
+    const ms = Date.parse(raw);
+    return { raw, ms };
+  }
+
+  function normalizeName(name){
+    return String(name ?? "").trim().toLowerCase();
+  }
+
+  let ALL = [];
+
+  function buildTypeOptions(items){
+    const sel = document.getElementById("filterType");
+    if (!sel) return;
+
+    sel.innerHTML = '<option value="">すべて</option>';
+
+    const types = new Set();
+    for (const it of items){
+      if (it.type) types.add(it.type);
+    }
+
+    // type columnが無い場合：希望欄から候補を作る
+    if (!types.size){
+      for (const it of items){
+        [it.w1, it.w2, it.w3].forEach(v => {
+          const s = (v || "").trim();
+          if (s) types.add(s);
+        });
+      }
+    }
+
+    Array.from(types).sort((a,b)=>a.localeCompare(b, "ja")).forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  }
+
+  function render(items){
+    const el = document.getElementById("wishList");
+    if (!el) return;
+
+    if (!items.length){
+      el.innerHTML = '<div class="opinionEmpty">該当する希望がありません。</div>';
+      return;
+    }
+
+    el.innerHTML = "";
+    for (const it of items){
+      const name = it.name || "匿名";
+
+      const card = document.createElement("div");
+      card.className = "wishCard";
+      card.innerHTML = `
+        <div class="wishHead">
+          <div class="wishName">👤 ${escapeHtml(name)}</div>
+          ${it.time ? `<div class="wishTime">${escapeHtml(it.time)}</div>` : ``}
+        </div>
+
+        <div class="wishRows">
+          <div class="wishRow"><span class="wishLabel">第1希望</span><span class="wishVal">${escapeHtml(it.w1 || "—")}</span></div>
+          <div class="wishRow"><span class="wishLabel">第2希望</span><span class="wishVal">${escapeHtml(it.w2 || "—")}</span></div>
+          <div class="wishRow"><span class="wishLabel">第3希望</span><span class="wishVal">${escapeHtml(it.w3 || "—")}</span></div>
+        </div>
+
+        ${it.type ? `<div class="wishType">希望種：<b>${escapeHtml(it.type)}</b></div>` : ``}
+      `;
+      el.appendChild(card);
+    }
+  }
+
+  function applyFilters(){
+    const nameQ = String(document.getElementById("filterName")?.value ?? "").trim().toLowerCase();
+    const typeQ = String(document.getElementById("filterType")?.value ?? "").trim();
+
+    let items = ALL.slice();
+
+    if (nameQ){
+      items = items.filter(it => normalizeName(it.name).includes(nameQ));
+    }
+
+    if (typeQ){
+      items = items.filter(it => {
+        if (it.type) return it.type === typeQ;
+        return [it.w1, it.w2, it.w3].some(v => String(v ?? "").trim() === typeQ);
+      });
+    }
+
+    render(items);
+  }
+
+  function wireFilters(){
+    const nameEl = document.getElementById("filterName");
+    const typeEl = document.getElementById("filterType");
+    const clearBtn = document.getElementById("filterClear");
+
+    nameEl && nameEl.addEventListener("input", ()=>applyFilters());
+    typeEl && typeEl.addEventListener("change", ()=>applyFilters());
+    clearBtn && clearBtn.addEventListener("click", ()=>{
+      if (nameEl) nameEl.value = "";
+      if (typeEl) typeEl.value = "";
+      applyFilters();
+    });
+  }
+
+  fetch(CSV_URL, { cache: "no-store" })
+    .then(r => {
+      if (!r.ok) throw new Error("fetch failed");
+      return r.text();
+    })
+    .then(text => {
+      const rows = parseCSV(text);
+      if (!rows.length){
+        ALL = [];
+        buildTypeOptions([]);
+        render([]);
+        wireFilters();
+        return;
+      }
+
+      const header = rows[0].map(h => (h || "").trim());
+      const dataRows = rows.slice(1).filter(r => r.some(x => String(x || "").trim() !== ""));
+
+      const rawItems = dataRows.map((r, idx) => {
+        const obj = {};
+        header.forEach((h, i) => { obj[h] = r[i] ?? ""; });
+
+        const timeStr = pick(obj, ["タイムスタンプ", "Timestamp", "timestamp", "送信日時"]);
+        const t = parseTime(timeStr);
+
+        const name = pick(obj, ["名前", "お名前", "name", "Name"]);
+
+        const w1 = stripParen(pick(obj, ["第1希望", "第一希望", "第１希望", "1st", "希望1", "希望１"]));
+        const w2 = stripParen(pick(obj, ["第2希望", "第二希望", "第２希望", "2nd", "希望2", "希望２"]));
+        const w3 = stripParen(pick(obj, ["第3希望", "第三希望", "第３希望", "3rd", "希望3", "希望３"]));
+
+        const type = stripParen(pick(obj, ["希望種", "希望の種類", "種類", "タイプ", "種別"]));
+
+        return {
+          time: t.raw,
+          timeMs: t.ms,
+          _idx: idx,
+          name: name.trim(),
+          w1, w2, w3,
+          type
+        };
+      }).filter(x => (x.w1 || x.w2 || x.w3 || x.type));
+
+      // 同一名は最新のみ（timestampが無い/読めない場合は後ろの行を採用）
+      const byName = new Map();
+      for (const it of rawItems){
+        const key = normalizeName(it.name || "");
+        if (!byName.has(key)){
+          byName.set(key, it);
+          continue;
+        }
+        const cur = byName.get(key);
+
+        const a = Number.isFinite(cur.timeMs) ? cur.timeMs : -1;
+        const b = Number.isFinite(it.timeMs) ? it.timeMs : -1;
+
+        if (b > a){
+          byName.set(key, it);
+        } else if (b === a && it._idx > cur._idx){
+          byName.set(key, it);
+        }
+      }
+
+      ALL = Array.from(byName.values()).sort((x,y)=>{
+        const ax = Number.isFinite(x.timeMs) ? x.timeMs : -1;
+        const ay = Number.isFinite(y.timeMs) ? y.timeMs : -1;
+        if (ay !== ax) return ay - ax;
+        return (y._idx || 0) - (x._idx || 0);
+      });
+
+      buildTypeOptions(ALL);
+      wireFilters();
+      applyFilters();
+    })
+    .catch(() => {
+      const el = document.getElementById("wishList");
+      if (el) el.innerHTML = '<div class="opinionEmpty">希望一覧を表示できませんでした。</div>';
+    });
+})();
+</script>
+
+</body>
+</html>

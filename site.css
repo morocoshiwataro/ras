@@ -1065,103 +1065,110 @@ img{
   top: 0.05em;
   color: rgba(40,30,20,.75);
 }
-
 /* =========================
-   目安箱（投稿カード）
+   宝箱の希望（フィルタ＆カード）
+   ※既存の見た目を壊さない追記のみ
    ========================= */
 
-.embedBox{
-  border: 1px solid rgba(255,255,255,.14);
+.wishFilters{
+  margin-top: 12px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.12);
   border-radius: 16px;
-  overflow: hidden;
-  background: rgba(0,0,0,.18);
+  background: rgba(0,0,0,.14);
+}
+@media (min-width: 720px){
+  .wishFilters{
+    grid-template-columns: 1fr 1fr 220px;
+    align-items:end;
+  }
 }
 
-.opinionGrid{
+.wishFilterItem{ min-width: 0; }
+.wishFilterLabel{
+  display:block;
+  font-size: 12px;
+  font-weight: 950;
+  margin: 0 0 6px;
+  color: rgba(255,255,255,.80);
+}
+.wishFilters input,
+.wishFilters select{
+  width: 100%;
+}
+
+.wishGrid{
   display:grid;
   grid-template-columns: 1fr;
   gap: 12px;
   margin-top: 12px;
 }
 @media (min-width: 720px){
-  .opinionGrid{ grid-template-columns: 1fr 1fr; }
+  .wishGrid{ grid-template-columns: 1fr 1fr; }
 }
 
-.opinionCard{
+.wishCard{
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 16px;
   background: rgba(255,255,255,.04);
   padding: 14px;
 }
 
-.opinionMsg{
-  font-size: 14px;
-  line-height: 1.85;
-  color: rgba(255,255,255,.92);
-  white-space: pre-wrap;
-}
-
-.opinionMeta{
-  margin-top: 10px;
+.wishHead{
   display:flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items:baseline;
+  justify-content:space-between;
   gap: 10px;
+  margin-bottom: 10px;
 }
-
-.opinionName{
-  font-size: 12px;
-  color: rgba(255,255,255,.58);
-  font-weight: 900;
+.wishName{
+  font-size: 13px;
+  font-weight: 950;
+  color: rgba(255,255,255,.90);
 }
-
-.opinionTime{
+.wishTime{
   font-size: 12px;
   color: rgba(255,255,255,.45);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.opinionEmpty{
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 16px;
-  background: rgba(0,0,0,.16);
-  padding: 14px;
+.wishRows{
+  display:grid;
+  gap: 8px;
+}
+.wishRow{
+  display:grid;
+  grid-template-columns: 74px 1fr;
+  gap: 10px;
+  align-items:start;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+}
+.wishLabel{
+  font-size: 12px;
+  font-weight: 950;
   color: rgba(255,255,255,.70);
-  font-size: 13px;
+  white-space: nowrap;
+}
+.wishVal{
+  font-size: 14px;
   line-height: 1.7;
+  color: rgba(255,255,255,.92);
+  white-space: pre-wrap;
 }
 
-/* ===== Home: top button (Meyasubako) ===== */
-.menuTopBtn{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  width:100%;
-  margin: 0 0 12px;
-  padding: 14px 14px;
-  border-radius: var(--radius, 16px);
-  border: 1px solid rgba(199,154,75,.32);
-  background: rgba(199,154,75,.14);
+.wishType{
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
+.wishType b{
   color: rgba(255,242,220,.95);
-  text-decoration:none;
-  box-shadow: 0 10px 22px rgba(0,0,0,.22);
+  font-weight: 950;
 }
-.menuTopBtn:hover{
-  background: rgba(199,154,75,.18);
-  border-color: rgba(199,154,75,.46);
-}
-.menuTopIcon{
-  width: 38px;
-  height: 38px;
-  display:grid;
-  place-items:center;
-  border-radius: 14px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.14);
-  font-size: 18px;
-  flex: 0 0 auto;
-}
-.menuTopTextWrap{ display:flex; flex-direction:column; gap:2px; }
-.menuTopText{ font-size: 16px; font-weight: 950; line-height: 1.2; }
-.menuTopSub{ font-size: 12px; color: rgba(255,255,255,.72); font-weight: 800; line-height: 1.2; }
