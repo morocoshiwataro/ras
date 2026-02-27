@@ -1344,3 +1344,7 @@ img{
   cursor: pointer;
 }
 .clearBtn:hover{ background: rgba(199,154,75,.16); }
+
+
+/* === Takarabako: avoid preserved newlines in structured rows === */
+.pageTakarabako .opinionMain{ white-space: normal; }

@@ -6,14 +6,13 @@
   <title>宝箱の希望 | 【ras】鯛せんべい用：まとめサイト</title>
   <link rel="stylesheet" href="site.css">
 </head>
-<body>
+<body class="pageTakarabako">
   <div class="wrap">
     <div class="siteHeader"><a href="home.html">【ras】鯛せんべい用：まとめサイト</a></div>
 
     <header>
       <h1>宝箱の希望</h1>
-      <div class="sub">希望を提出すると、下に最新の内容が反映されます（反映まで少し時間がかかる場合があります）。</div>
-    </header>
+</header>
 
     <main class="card">
 
@@ -165,18 +164,8 @@
       filtered.forEach(r => {
         const card = document.createElement("div");
         card.className = "opinionCard";
-        card.innerHTML = `
-          <div class="opinionMain">
-            <div><b>第一希望：</b> ${escapeHtml(r.c1 || "—")}</div>
-            <div><b>第二希望：</b> ${escapeHtml(r.c2 || "—")}</div>
-            <div><b>第三希望：</b> ${escapeHtml(r.c3 || "—")}</div>
-          </div>
-          <div class="opinionMeta">
-            <span class="opinionName">${escapeHtml(r.name || "—")}</span>
-            <span>${escapeHtml(r.dateOnly || "")}</span>
-          </div>
-        `;
-        list.appendChild(card);
+        card.innerHTML = `<div class="opinionMain"><div><b>第一希望：</b> ${escapeHtml(r.c1 || "—")}</div><div><b>第二希望：</b> ${escapeHtml(r.c2 || "—")}</div><div><b>第三希望：</b> ${escapeHtml(r.c3 || "—")}</div></div><div class="opinionMeta"><span class="opinionName">${escapeHtml(r.name || "—")}</span><span>${escapeHtml(r.dateOnly || "")}</span></div>`;
+        list.appendChild(card);(card);
       });
     }
 
