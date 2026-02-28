@@ -41,11 +41,10 @@
           <input id="lockInput" type="password" placeholder="パスワードを入力">
           <button id="lockBtn" type="button">表示</button>
         </div>
-        <div id="lockError" class="lockError hidden">パスワードが違います</div>
+        <div id="lockError" class="lockError hidden" style="display:none" >パスワードが違います</div>
       </div>
 
-      <div id="opinionList" class="opinionGrid hidden" aria-live="polite">読み込み中…</div>
-
+<div id="opinionList" class="opinionGrid hidden" aria-live="polite" style="display:none" >読み込み中…</div>
     </main>
 
     <footer>
@@ -166,7 +165,7 @@
     });
 })();
 
-// 🔐 投稿一覧ロック
+// 🔐 投稿一覧ロック（簡易）
 (function(){
   const PASS = "yoshioka";
   const list = document.getElementById("opinionList");
@@ -176,11 +175,12 @@
   const err   = document.getElementById("lockError");
 
   function unlock(){
-    list.classList.remove("hidden");
-    box.classList.add("hidden");
+    list.style.display = "";
+    box.style.display = "none";
     localStorage.setItem("meyasubakoUnlocked","1");
   }
 
+  // 既に解除済みなら表示
   if(localStorage.getItem("meyasubakoUnlocked")==="1"){
     unlock();
   }
@@ -189,10 +189,11 @@
     if(input.value === PASS){
       unlock();
     }else{
-      err.classList.remove("hidden");
+      err.style.display = "";
     }
   });
 })();
+
 </script>
 
 </body>
