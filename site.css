@@ -121,7 +121,7 @@
     }
 
     .divider{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
-    .hidden{ display:none; }
+    .hidden{ display:none !important; }
 
     /* Results */
     .results{ margin-top: 12px; display:grid; gap: 10px; }
@@ -1065,6 +1065,304 @@ img{
   top: 0.05em;
   color: rgba(40,30,20,.75);
 }
+/* =========================
+   宝箱の希望（フィルタ＆カード）
+   ※既存の見た目を壊さない追記のみ
+   ========================= */
+
+.wishFilters{
+  margin-top: 12px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,.14);
+}
+@media (min-width: 720px){
+  .wishFilters{
+    grid-template-columns: 1fr 1fr 220px;
+    align-items:end;
+  }
+}
+
+.wishFilterItem{ min-width: 0; }
+.wishFilterLabel{
+  display:block;
+  font-size: 12px;
+  font-weight: 950;
+  margin: 0 0 6px;
+  color: rgba(255,255,255,.80);
+}
+.wishFilters input,
+.wishFilters select{
+  width: 100%;
+}
+
+.wishGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+@media (min-width: 720px){
+  .wishGrid{ grid-template-columns: 1fr 1fr; }
+}
+
+.wishCard{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+  padding: 14px;
+}
+
+.wishHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.wishName{
+  font-size: 13px;
+  font-weight: 950;
+  color: rgba(255,255,255,.90);
+}
+.wishTime{
+  font-size: 12px;
+  color: rgba(255,255,255,.45);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.wishRows{
+  display:grid;
+  gap: 8px;
+}
+.wishRow{
+  display:grid;
+  grid-template-columns: 74px 1fr;
+  gap: 10px;
+  align-items:start;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+}
+.wishLabel{
+  font-size: 12px;
+  font-weight: 950;
+  color: rgba(255,255,255,.70);
+  white-space: nowrap;
+}
+.wishVal{
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.92);
+  white-space: pre-wrap;
+}
+
+.wishType{
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
+.wishType b{
+  color: rgba(255,242,220,.95);
+  font-weight: 950;
+}
+
+
+/* === Emphasis underline color (accent) === */
+.emph{ text-decoration-color: var(--accent); }
+
+/* ===== Meyasubako CTA button (home) ===== */
+.meyasubakoCta{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: 14px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(199,154,75,.34);
+  background: linear-gradient(180deg, rgba(199,154,75,.16), rgba(255,255,255,.04));
+  box-shadow: 0 18px 44px rgba(0,0,0,.26);
+  text-decoration:none;
+  color: rgba(255,255,255,.95);
+  margin: 10px 0 14px;
+}
+.meyasubakoCta:hover{
+  border-color: rgba(199,154,75,.55);
+  background: linear-gradient(180deg, rgba(199,154,75,.20), rgba(255,255,255,.05));
+  transform: translateY(-1px);
+}
+.meyasubakoCtaIcon{
+  width: 40px; height: 40px;
+  display:grid; place-items:center;
+  border-radius: 14px;
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.12);
+  font-size: 20px;
+  flex: 0 0 auto;
+}
+.meyasubakoCtaText{ display:flex; flex-direction:column; gap:2px; }
+.meyasubakoCtaTitle{ font-weight: 950; font-size: 15px; letter-spacing:.02em; }
+.meyasubakoCtaSub{ font-size: 12px; color: rgba(255,255,255,.70); }
+.meyasubakoCtaArrow{
+  margin-left:auto;
+  font-size: 22px;
+  opacity:.8;
+  padding-left: 6px;
+}
+
+/* ===== Tier-style rank table (rules) ===== */
+.tierTable{
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  overflow:hidden;
+  background: rgba(0,0,0,.14);
+}
+.tierRow{
+  display:grid;
+  grid-template-columns: 84px 1fr;
+  gap: 12px;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  align-items: start;
+}
+.tierRow:last-child{ border-bottom:none; }
+.tierKey{
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  padding: 6px 10px;
+  border-radius: 12px;
+  text-align:center;
+  border: 1px solid rgba(199,154,75,.28);
+  background: rgba(199,154,75,.12);
+  color: rgba(255,242,220,.94);
+}
+.tierVal{
+  color: rgba(255,255,255,.90);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+
+/* === Force emph underline to display === */
+.emph{ text-decoration-line: underline !important; text-decoration-color: var(--accent) !important; }
+
+
+/* === Marker-style emphasis (bold + highlight) === */
+.emph{
+  font-weight: 950 !important;
+  text-decoration: none !important;
+  background-image: linear-gradient(transparent 62%, rgba(199,154,75,.38) 62%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: 0 .12em;
+  border-radius: 6px;
+}
+
+/* ===== Embedded Google Form box ===== */
+.embedBox{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0,0,0,.12);
+}
+.embedBox iframe{
+  display:block;
+  width: 100%;
+  border: 0;
+}
+
+/* ===== Opinion / wish cards grid ===== */
+.opinionGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+@media (min-width: 720px){
+  .opinionGrid{ grid-template-columns: 1fr 1fr; }
+}
+.opinionCard{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+  padding: 12px 12px;
+}
+.opinionMain{
+  font-size: 14px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.92);
+  white-space: pre-wrap;
+}
+.opinionMeta{
+  margin-top: 10px;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  color: rgba(255,255,255,.60);
+  font-size: 12px;
+}
+.opinionName{
+  font-weight: 900;
+  color: rgba(255,255,255,.80);
+}
+
+/* ===== Filters ===== */
+.filterBar{
+  margin-top: 10px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 720px){
+  .filterBar{ grid-template-columns: 1.2fr 1fr 220px; align-items:end; }
+}
+.filterBar .field label{
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255,255,255,.75);
+}
+.filterBar input, .filterBar select{
+  width:100%;
+}
+.clearBtn{
+  width:100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(199,154,75,.30);
+  background: rgba(199,154,75,.12);
+  color: #ffe7be;
+  font-weight: 950;
+  cursor: pointer;
+}
+.clearBtn:hover{ background: rgba(199,154,75,.16); }
+
+
+/* === Takarabako: avoid preserved newlines in structured rows === */
+.pageTakarabako .opinionMain{ white-space: normal; }
+
+/* ===== Card grid (generic) ===== */
+.suggestionGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+@media (min-width: 720px){
+  .suggestionGrid{ grid-template-columns: 1fr 1fr; }
+}
+
+/* ===== Filter spacing ===== */
+.filterBar{ margin-bottom: 14px; }
+
 
 /* ===== Meyasubako lock ===== */
 .lockBox{
