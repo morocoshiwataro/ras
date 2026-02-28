@@ -33,7 +33,19 @@
       <div class="headingBig">💬 投稿一覧</div>
       <div class="sub" style="margin-top:-4px;">反映まで少し時間がかかる場合があります。</div>
 
-      <div id="opinionList" class="opinionGrid" aria-live="polite">読み込み中…</div>
+      
+      <!-- 🔐 官職用ロック -->
+      <div id="opinionLock" class="lockBox">
+        <div class="lockText">官職メンバーのみ閲覧できます</div>
+        <div class="lockRow">
+          <input id="lockInput" type="password" placeholder="パスワードを入力">
+          <button id="lockBtn" type="button">表示</button>
+        </div>
+        <div id="lockError" class="lockError hidden">パスワードが違います</div>
+      </div>
+
+      <div id="opinionList" class="opinionGrid hidden" aria-live="polite">読み込み中…</div>
+
     </main>
 
     <footer>
@@ -152,6 +164,34 @@
       const el = document.getElementById("opinionList");
       if (el) el.innerHTML = '<div class="opinionEmpty">投稿一覧を表示できませんでした。</div>';
     });
+})();
+
+// 🔐 投稿一覧ロック
+(function(){
+  const PASS = "吉岡";
+  const list = document.getElementById("opinionList");
+  const box  = document.getElementById("opinionLock");
+  const input = document.getElementById("lockInput");
+  const btn   = document.getElementById("lockBtn");
+  const err   = document.getElementById("lockError");
+
+  function unlock(){
+    list.classList.remove("hidden");
+    box.classList.add("hidden");
+    localStorage.setItem("meyasubakoUnlocked","1");
+  }
+
+  if(localStorage.getItem("meyasubakoUnlocked")==="1"){
+    unlock();
+  }
+
+  btn.addEventListener("click", ()=>{
+    if(input.value === PASS){
+      unlock();
+    }else{
+      err.classList.remove("hidden");
+    }
+  });
 })();
 </script>
 
