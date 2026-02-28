@@ -121,7 +121,7 @@
     }
 
     .divider{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
-    .hidden{ display:none; }
+    .hidden{ display:none !important; }
 
     /* Results */
     .results{ margin-top: 12px; display:grid; gap: 10px; }
