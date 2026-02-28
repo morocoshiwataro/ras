@@ -41,10 +41,10 @@
           <input id="lockInput" type="password" placeholder="パスワードを入力">
           <button id="lockBtn" type="button">表示</button>
         </div>
-        <div id="lockError" class="lockError hidden" style="display:none" >パスワードが違います</div>
+        <div id="lockError" class="lockError" style="display:none;">パスワードが違います</div>
       </div>
 
-<div id="opinionList" class="opinionGrid hidden" aria-live="polite" style="display:none" >読み込み中…</div>
+<div id="opinionList" class="opinionGrid" aria-live="polite" style="display:none;">読み込み中…</div>
     </main>
 
     <footer>
@@ -166,6 +166,7 @@
 })();
 
 // 🔐 投稿一覧ロック（簡易）
+// - CSSが効かなくても動くよう、display を直接切り替えます
 (function(){
   const PASS = "yoshioka";
   const list = document.getElementById("opinionList");
@@ -175,23 +176,27 @@
   const err   = document.getElementById("lockError");
 
   function unlock(){
-    list.style.display = "";
-    box.style.display = "none";
+    if(list) list.style.display = "";
+    if(box) box.style.display = "none";
     localStorage.setItem("meyasubakoUnlocked","1");
   }
 
-  // 既に解除済みなら表示
+  // 初期状態：一覧は必ず非表示
+  if(list) list.style.display = "none";
+
   if(localStorage.getItem("meyasubakoUnlocked")==="1"){
     unlock();
   }
 
-  btn.addEventListener("click", ()=>{
-    if(input.value === PASS){
-      unlock();
-    }else{
-      err.style.display = "";
-    }
-  });
+  if(btn){
+    btn.addEventListener("click", ()=>{
+      if(input && input.value === PASS){
+        unlock();
+      }else{
+        if(err) err.style.display = "";
+      }
+    });
+  }
 })();
 
 </script>
