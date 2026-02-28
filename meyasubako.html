@@ -166,7 +166,8 @@
 })();
 
 // 🔐 投稿一覧ロック（簡易）
-// - CSSが効かなくても動くよう、display を直接切り替えます
+// - 以前の解除状態(localStorage)が残っている場合があるので、毎回リセットします
+// - 解除は「このタブを開いている間だけ」（sessionStorage）にします
 (function(){
   const PASS = "yoshioka";
   const list = document.getElementById("opinionList");
@@ -175,18 +176,32 @@
   const btn   = document.getElementById("lockBtn");
   const err   = document.getElementById("lockError");
 
+  // 旧キーが残っていても毎回解除されないようにリセット
+  try { localStorage.removeItem("meyasubakoUnlocked"); } catch(e) {}
+
+  function lock(){
+    if(list) list.style.display = "none";
+    if(box) box.style.display = "";
+    if(err) err.style.display = "none";
+    try { sessionStorage.removeItem("meyasubakoUnlocked"); } catch(e) {}
+  }
+
   function unlock(){
     if(list) list.style.display = "";
     if(box) box.style.display = "none";
-    localStorage.setItem("meyasubakoUnlocked","1");
+    if(err) err.style.display = "none";
+    try { sessionStorage.setItem("meyasubakoUnlocked","1"); } catch(e) {}
   }
 
-  // 初期状態：一覧は必ず非表示
-  if(list) list.style.display = "none";
+  // 初期状態：必ずロック
+  lock();
 
-  if(localStorage.getItem("meyasubakoUnlocked")==="1"){
-    unlock();
-  }
+  // 同一タブ内で戻ってきた時だけ維持
+  try {
+    if(sessionStorage.getItem("meyasubakoUnlocked")==="1"){
+      unlock();
+    }
+  } catch(e) {}
 
   if(btn){
     btn.addEventListener("click", ()=>{
@@ -198,7 +213,6 @@
     });
   }
 })();
-
 </script>
 
 </body>
