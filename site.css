@@ -121,7 +121,7 @@
     }
 
     .divider{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
-    .hidden{ display:none !important; }
+    .hidden{ display:none; }
 
     /* Results */
     .results{ margin-top: 12px; display:grid; gap: 10px; }
@@ -1364,49 +1364,74 @@ img{
 .filterBar{ margin-bottom: 14px; }
 
 
-/* ===== Meyasubako lock ===== */
-.lockBox{
-  margin-top: 10px;
-  padding: 12px;
-  border: 1px solid rgba(199,154,75,.30);
-  border-radius: 16px;
-  background: rgba(0,0,0,.14);
-}
-.lockText{
-  font-size: 13px;
-  margin-bottom: 8px;
-  color: rgba(255,255,255,.85);
-}
-.lockRow{
+/* ===== Header mail icon ===== */
+.siteHeader{
   display:flex;
-  gap:8px;
-}
-.lockRow input{
-  flex:1;
-}
-.lockRow button{
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(199,154,75,.35);
-  background: rgba(199,154,75,.16);
-  color: #ffe7be;
-  font-weight: 900;
-  cursor:pointer;
-}
-.lockError{
-  margin-top: 6px;
-  font-size: 12px;
-  color: #ffb3b3;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
 }
 
-/* ===== Card grid / spacing safety (override) ===== */
-.suggestionGrid{
+.mailIcon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  text-decoration:none;
+  font-size:18px;
+  color:var(--text);
+  transition:.15s;
+}
+.mailIcon:hover{
+  background:rgba(199,154,75,.25);
+  border-color:rgba(199,154,75,.45);
+}
+
+/* ===== Message template page ===== */
+
+.templateGrid{
   display:grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-top: 14px;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:10px;
+  margin-top:12px;
 }
-@media (min-width: 720px){
-  .suggestionGrid{ grid-template-columns: 1fr 1fr; }
+
+.templateCard{
+  cursor:pointer;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--card);
+  font-size:13px;
+  line-height:1.45;
+  transition:.15s;
 }
-.filterBar{ margin-bottom: 14px; }
+
+.templateCard:hover{
+  border-color:var(--accent);
+  transform:translateY(-2px);
+}
+
+.copyNotice{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#000;
+  color:#fff;
+  padding:8px 14px;
+  border-radius:8px;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+}
+
+.copyNotice.show{
+  opacity:1;
+}
