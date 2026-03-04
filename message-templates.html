@@ -3,80 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>メッセージテンプレ（コピー）</title>
+  <title>メッセージテンプレート</title>
   <link rel="stylesheet" href="site.css">
 </head>
 <body>
   <div class="wrap">
     <div class="siteHeader">
       <div class="siteHeaderInner">
-        <a class="siteHeaderTitle" href="home.html">【ras】鯛せんべい用：まとめサイト</a>
-        <div class="siteHeaderActions">
-          <a class="siteHeaderIconBtn" href="message-templates.html" aria-label="メッセージテンプレ（コピー）" title="メッセージテンプレ（コピー）">
-            <span aria-hidden="true">✉️</span>
-          </a>
-        </div>
+        <a class="siteTitleLink" href="home.html">【ras】鯛せんべい用：まとめサイト</a>
+        <a class="mailIconBtn" href="message-templates.html" title="メッセージテンプレート" aria-label="メッセージテンプレート">✉</a>
       </div>
     </div>
 
     <main class="card">
-      <div class="headingBig">✉️ メッセージテンプレ（ワンクリックでコピー）</div>
-      <p class="content" style="margin-top:10px;">
-        下のカードをクリックすると、そのままクリップボードにコピーされます。<br/>
-        週（通常/エスコマ）と曜日、イレギュラーを切り替えると表示内容が変わります。
-      </p>
+      <div class="headingBig">✉ メッセージテンプレート（ワンクリックコピー）</div>
 
-      <div class="tmplControls" role="region" aria-label="表示切り替え">
-        <div class="tmplField">
-          <div class="tmplLabel">週</div>
-          <select id="selWeek">
-            <option value="auto">自動（今週を判定）</option>
-            <option value="normal">通常週</option>
-            <option value="esukoma">エスコマ週</option>
-          </select>
-        </div>
+      <div class="templateControls" aria-label="表示切り替え">
+        <div class="templateControlsRow">
+          <div class="templateControlsLeft">
+            <span class="pillBtn isActive" data-week="auto">週：自動</span>
+            <span class="pillBtn" data-week="esukoma">週：エスコマ</span>
+            <span class="pillBtn" data-week="normal">週：通常</span>
+          </div>
 
-        <div class="tmplField">
-          <div class="tmplLabel">曜日</div>
-          <select id="selDay">
-            <option value="today">今日</option>
-            <option value="1">月</option>
-            <option value="2">火</option>
-            <option value="3">水</option>
-            <option value="4">木</option>
-            <option value="5">金</option>
-            <option value="6">土</option>
-            <option value="0">日</option>
-          </select>
-        </div>
+          <div class="templateControlsLeft">
+            <span class="pillBtn isActive" data-day="today">今日</span>
+            <span class="pillBtn" data-day="1">月</span>
+            <span class="pillBtn" data-day="2">火</span>
+            <span class="pillBtn" data-day="3">水</span>
+            <span class="pillBtn" data-day="4">木</span>
+            <span class="pillBtn" data-day="5">金</span>
+            <span class="pillBtn" data-day="6">土</span>
+            <span class="pillBtn" data-day="0">日</span>
+          </div>
 
-        <div class="tmplField">
-          <div class="tmplLabel">イレギュラー</div>
-          <select id="selIrregular">
-            <option value="">なし</option>
-            <option value="nap">NAP提案</option>
-            <option value="thanks">対応のお礼</option>
-            <option value="resource">資材返還依頼</option>
-          </select>
+          <div class="templateControlsLeft">
+            <span class="pillBtn" data-irregular="1">イレギュラーも表示</span>
+          </div>
         </div>
+        <div class="hint" id="viewHint">読み込み中…</div>
       </div>
 
-      <div class="tmplMeta" id="tmplMeta">読み込み中…</div>
-
-      <div class="tmplGrid" id="tmplGrid" aria-live="polite"></div>
-
-      <div class="toast" id="toast" role="status" aria-live="polite">コピーしました</div>
-
-      <footer>
-        <b>編集方法：</b>このページ内の <code>TEMPLATES</code> を書き換えるだけで、表示内容を増やせます。
-      </footer>
+      <div class="templateGrid" id="tplGrid" aria-live="polite"></div>
     </main>
   </div>
 
+  <div class="copyToast" id="copyToast">コピーしました</div>
+
 <script>
 (function(){
-  // ===== home.html と同じ「週判定」ロジック =====
-  const ANCHOR_MONDAY = new Date(Date.UTC(2026, 0, 20)); // 2026-01-20 をエスコマ週の基準（月曜）
+  // =========================
+  // 週判定：home.html と同じ基準（必要ならここだけ変更）
+  // =========================
+  const ANCHOR_MONDAY = new Date(Date.UTC(2026, 0, 20)); // 2026-01-20 をエスコマ週の基準にする（homeと同じ）
   function startOfWeekMondayUTC(d){
     const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
     const day = (x.getUTCDay() + 6) % 7; // Mon=0 ... Sun=6
@@ -90,188 +69,232 @@
     return Math.round(diff / ms);
   }
 
-  const WEEKDAY_LABEL = {0:"日",1:"月",2:"火",3:"水",4:"木",5:"金",6:"土"};
-
-  // ===== テンプレデータ（ここを増やせます）=====
-  // weekday: 0=日,1=月,...6=土
-  // 14日分（通常週7 + エスコマ週7） + イレギュラー
+  // =========================
+  // テンプレ本文（ここを書き換えて使ってください）
+  //  - esukoma / normal の2種類
+  //  - 曜日は 0=日, 1=月, ... 6=土
+  // =========================
   const TEMPLATES = {
-    normal: {
-      1: [
-        {title:"（月）連絡用", body:"【月】今週もよろしくお願いします！"}
-      ],
-      2: [
-        {title:"（火）ギルドパーティー", body:"【火】ギルドパーティー参加します。よろしく！"},
-        {title:"（火）デッドライジング", body:"【火】デッドライジング参加します（21:30〜）。"}
-      ],
-      3: [
-        {title:"（水）スピーカートラップ", body:"【水】スピーカートラップ参加します（21:00〜）。"}
-      ],
-      4: [
-        {title:"（木）ギルドパーティー", body:"【木】ギルドパーティー参加します。よろしく！"},
-        {title:"（木）デッドライジング", body:"【木】デッドライジング参加します（21:30〜）。"}
-      ],
-      5: [
-        {title:"（金）金曜イベント", body:"【金】金曜イベント参加します（21:00〜）。"}
-      ],
-      6: [
-        {title:"（土）エンパ", body:"【土】エンパイアウォー参加します（19:00〜）。"}
-      ],
-      0: [
-        {title:"（日）スピーカートラップ", body:"【日】スピーカートラップ参加します（21:00〜）。"}
-      ]
-    },
     esukoma: {
       1: [
-        {title:"（月）連絡用", body:"【月】エスコマ週です。今週もよろしくお願いします！"}
+        { title: "（例）月：連絡テンプレA", text: "【エスコマ週・月】\n（ここに文章）" },
       ],
       2: [
-        {title:"（火）ギルドパーティー", body:"【火】ギルドパーティー参加します。よろしく！"},
-        {title:"（火）ギルド守衛戦", body:"【火】ギルド守衛戦参加します（21:30〜）。"}
+        { title: "（例）火：ギルドパーティー＋守衛戦", text: "【エスコマ週・火】\nギルドパーティー(21:00〜)→守衛戦(21:30〜)\n（必要な連絡文）" },
       ],
       3: [
-        {title:"（水）スピーカートラップ", body:"【水】スピーカートラップ参加します（21:00〜）。"}
+        { title: "（例）水：スピーカートラップ", text: "【エスコマ週・水】\nスピーカートラップ(21:00〜)\n（必要な連絡文）" },
       ],
       4: [
-        {title:"（木）ギルドパーティー", body:"【木】ギルドパーティー参加します。よろしく！"},
-        {title:"（木）ギルド守衛戦", body:"【木】ギルド守衛戦参加します（21:30〜）。"}
+        { title: "（例）木：ギルドパーティー＋守衛戦", text: "【エスコマ週・木】\nギルドパーティー(21:00〜)→守衛戦(21:30〜)\n（必要な連絡文）" },
       ],
       5: [
-        {title:"（金）金曜イベント", body:"【金】金曜イベント参加します（21:00〜）。"}
+        { title: "（例）金：週次イベント", text: "【エスコマ週・金】\n（氷原/大乱闘/浄水 など）\n（必要な連絡文）" },
       ],
       6: [
-        {title:"（土）荒野の王", body:"【土】荒野の王参加します（19:00〜）。"}
+        { title: "（例）土：荒野の王", text: "【エスコマ週・土】\n荒野の王(19:00〜)\n（必要な連絡文）" },
       ],
       0: [
-        {title:"（日）スピーカートラップ", body:"【日】スピーカートラップ参加します（21:00〜）。"}
-      ]
+        { title: "（例）日：スピーカートラップ", text: "【エスコマ週・日】\nスピーカートラップ(21:00〜)\n（必要な連絡文）" },
+      ],
     },
-    irregular: {
-      nap: [
-        {title:"NAP提案（英語）", body:"Hello. I am from ras alliance. I propose a NAP with the following conditions. Please consider.\n\n[NAP]\nFort 1 Tower 1,2,3\nFort 2 Tower 6,7,8\nHQ\nAll NAPs will be released 10 minutes before the end of the event\n\nThank you."}
+    normal: {
+      1: [
+        { title: "（例）月：連絡テンプレA", text: "【通常週・月】\n（ここに文章）" },
       ],
-      thanks: [
-        {title:"対応のお礼（英語）", body:"Thank you for your detailed help. I really appreciate it. If anything comes up, please let me know."},
-        {title:"対応のお礼（日本語）", body:"丁寧に対応してくれてありがとう！助かりました。何かあれば遠慮なく言ってください。"}
+      2: [
+        { title: "（例）火：ギルドパーティー＋デッドライジング", text: "【通常週・火】\nギルドパーティー(21:00〜)→デッドライジング(21:30〜)\n（必要な連絡文）" },
       ],
-      resource: [
-        {title:"資材返還依頼（英語）", body:"Could you return the resources from the battle result? If possible, please share the exact amounts so we can confirm. Thank you."}
-      ]
-    }
+      3: [
+        { title: "（例）水：スピーカートラップ", text: "【通常週・水】\nスピーカートラップ(21:00〜)\n（必要な連絡文）" },
+      ],
+      4: [
+        { title: "（例）木：ギルドパーティー＋デッドライジング", text: "【通常週・木】\nギルドパーティー(21:00〜)→デッドライジング(21:30〜)\n（必要な連絡文）" },
+      ],
+      5: [
+        { title: "（例）金：週次イベント", text: "【通常週・金】\n（氷原/大乱闘/浄水 など）\n（必要な連絡文）" },
+      ],
+      6: [
+        { title: "（例）土：エンパイアウォー", text: "【通常週・土】\nエンパイアウォー(19:00〜)\n（必要な連絡文）" },
+      ],
+      0: [
+        { title: "（例）日：スピーカートラップ", text: "【通常週・日】\nスピーカートラップ(21:00〜)\n（必要な連絡文）" },
+      ],
+    },
+    irregular: [
+      { title: "イレギュラー：汎用（例）", text: "【イレギュラー】\n（緊急連絡・変更・注意喚起など）" },
+    ],
   };
 
-  // ===== UI / render =====
-  const selWeek = document.getElementById("selWeek");
-  const selDay  = document.getElementById("selDay");
-  const selIrr  = document.getElementById("selIrregular");
-  const grid    = document.getElementById("tmplGrid");
-  const meta    = document.getElementById("tmplMeta");
-  const toast   = document.getElementById("toast");
+  // =========================
+  // 状態（週・曜日）
+  // =========================
+  const now = new Date();
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const todayWeekday = todayUTC.getUTCDay(); // Sun=0 ... Sat=6
+  const weekIndex = weeksBetween(ANCHOR_MONDAY, todayUTC);
+  const autoIsEsukoma = (weekIndex % 2 === 0);
+  const autoWeekKey = autoIsEsukoma ? "esukoma" : "normal";
 
-  function getTodayUTC(){
-    const now = new Date();
-    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  let stateWeek = "auto";      // auto | esukoma | normal
+  let stateDay = "today";      // today | 0..6
+  let showIrregular = false;
+
+  const weekBtns = Array.from(document.querySelectorAll('[data-week]'));
+  const dayBtns = Array.from(document.querySelectorAll('[data-day]'));
+  const irregularBtn = document.querySelector('[data-irregular]');
+  const hintEl = document.getElementById('viewHint');
+  const gridEl = document.getElementById('tplGrid');
+  const toastEl = document.getElementById('copyToast');
+
+  function weekLabel(key){
+    return key === "esukoma" ? "エスコマ週" : "通常週";
+  }
+  function dayLabel(n){
+    return ["日","月","火","水","木","金","土"][n] + "曜日";
   }
 
-  function resolveWeekType(todayUTC){
-    const weekIndex = weeksBetween(ANCHOR_MONDAY, todayUTC);
-    const isEsukomaWeek = (weekIndex % 2 === 0); // 0週目＝エスコマ週
-    return { weekIndex, weekType: isEsukomaWeek ? "esukoma" : "normal" };
+  function getActiveWeekKey(){
+    if (stateWeek === "auto") return autoWeekKey;
+    return stateWeek;
+  }
+  function getActiveDay(){
+    if (stateDay === "today") return todayWeekday;
+    return Number(stateDay);
   }
 
-  function render(){
-    const todayUTC = getTodayUTC();
-    const weekdayToday = todayUTC.getUTCDay(); // Sun=0...Sat=6
-
-    const resolved = resolveWeekType(todayUTC);
-    const weekType = (selWeek.value === "auto") ? resolved.weekType : selWeek.value;
-    const weekLabel = (weekType === "esukoma") ? "エスコマ週" : "通常週";
-
-    const day = (selDay.value === "today") ? weekdayToday : parseInt(selDay.value, 10);
-
-    const irrKey = selIrr.value || "";
-
-    // meta
-    meta.textContent = "表示：" + weekLabel + " / " + WEEKDAY_LABEL[day] + "曜日" + (irrKey ? " / イレギュラー：" + selIrr.options[selIrr.selectedIndex].textContent : "");
-
-    // collect templates
-    const list = []
-      .concat((TEMPLATES[weekType] && TEMPLATES[weekType][day]) ? TEMPLATES[weekType][day] : [])
-      .concat((irrKey && TEMPLATES.irregular[irrKey]) ? TEMPLATES.irregular[irrKey] : []);
-
-    // render
-    if (!list.length){
-      grid.innerHTML = '<div class="comingSoon">（この条件のテンプレはまだありません）</div>';
-      return;
-    }
-
-    grid.innerHTML = list.map((t, idx) => {
-      const safeTitle = escapeHtml(t.title || ("テンプレ" + (idx+1)));
-      const safeBody  = escapeHtml(t.body || "");
-      return `
-        <button class="copyTile" type="button" data-copy="${encodeAttr(t.body || "")}">
-          <div class="copyTop">
-            <div class="copyTitle">${safeTitle}</div>
-            <div class="copyBadge">クリックでコピー</div>
-          </div>
-          <pre class="copyBody">${safeBody}</pre>
-        </button>
-      `;
-    }).join("");
-
-    // bind
-    grid.querySelectorAll(".copyTile").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const text = btn.getAttribute("data-copy") || "";
-        await copyText(text);
-        showToast("コピーしました");
-      });
+  function setActivePill(list, attr, value){
+    list.forEach(b=>{
+      const v = b.getAttribute(attr);
+      if (String(v) === String(value)) b.classList.add('isActive');
+      else b.classList.remove('isActive');
     });
   }
 
   function showToast(msg){
-    toast.textContent = msg || "コピーしました";
-    toast.classList.add("show");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.remove("show"), 1200);
+    if (!toastEl) return;
+    toastEl.textContent = msg || "コピーしました";
+    toastEl.classList.add('show');
+    setTimeout(()=>toastEl.classList.remove('show'), 900);
   }
 
   async function copyText(text){
     try{
-      if (navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-        return true;
+      await navigator.clipboard.writeText(text);
+      showToast("コピーしました");
+      return true;
+    }catch(e){
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try{
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(ok ? "コピーしました" : "コピーできませんでした");
+        return ok;
+      }catch(err){
+        document.body.removeChild(ta);
+        showToast("コピーできませんでした");
+        return false;
       }
-    }catch(e){}
-    // fallback
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed";
-    ta.style.top = "-1000px";
-    ta.style.left = "-1000px";
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try{ document.execCommand("copy"); }catch(e){}
-    document.body.removeChild(ta);
-    return true;
+    }
   }
 
-  function escapeHtml(s){
-    return (s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-  function encodeAttr(s){
-    // keep as plain string but escape quotes/amps for attribute
-    return (s || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function render(){
+    const wk = getActiveWeekKey();
+    const day = getActiveDay();
+
+    // hint
+    if (hintEl){
+      hintEl.textContent = `表示：${stateWeek==="auto" ? "週：自動（" + weekLabel(wk) + "）" : "週：" + weekLabel(wk)} / ${stateDay==="today" ? "今日（" + dayLabel(day) + "）" : dayLabel(day)}${showIrregular ? " / イレギュラー表示中" : ""}`;
+    }
+
+    // build list
+    const list = [];
+    const byWeek = (TEMPLATES[wk] && TEMPLATES[wk][day]) ? TEMPLATES[wk][day] : [];
+    list.push(...byWeek);
+    if (showIrregular && Array.isArray(TEMPLATES.irregular)) list.push(...TEMPLATES.irregular);
+
+    // render cards
+    gridEl.innerHTML = "";
+    if (!list.length){
+      const div = document.createElement('div');
+      div.className = "hint";
+      div.textContent = "この条件で表示するテンプレートがありません（TEMPLATES を編集してください）。";
+      gridEl.appendChild(div);
+      return;
+    }
+
+    list.forEach((t, idx)=>{
+      const card = document.createElement('div');
+      card.className = 'templateCard';
+
+      const head = document.createElement('div');
+      head.className = 'templateCardHead';
+
+      const title = document.createElement('div');
+      title.className = 'templateTitle';
+      title.textContent = t.title || ("テンプレ " + (idx+1));
+
+      const btn = document.createElement('button');
+      btn.className = 'copyBtn';
+      btn.type = 'button';
+      btn.textContent = 'コピー';
+
+      const body = document.createElement('div');
+      body.className = 'templateBody';
+
+      const ta = document.createElement('textarea');
+      ta.className = 'templateText';
+      ta.readOnly = true;
+      ta.value = t.text || "";
+
+      btn.addEventListener('click', ()=>copyText(ta.value));
+      // カードのどこを押してもコピーしたい場合はここを有効化
+      // card.addEventListener('click', (e)=>{ if(e.target.tagName!=="TEXTAREA" && e.target.tagName!=="BUTTON") copyText(ta.value); });
+
+      head.appendChild(title);
+      head.appendChild(btn);
+      body.appendChild(ta);
+      card.appendChild(head);
+      card.appendChild(body);
+      gridEl.appendChild(card);
+    });
   }
 
-  // init
-  selWeek.addEventListener("change", render);
-  selDay.addEventListener("change", render);
-  selIrr.addEventListener("change", render);
+  // events
+  weekBtns.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      stateWeek = b.getAttribute('data-week');
+      setActivePill(weekBtns, 'data-week', stateWeek);
+      render();
+    });
+  });
+  dayBtns.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      stateDay = b.getAttribute('data-day');
+      setActivePill(dayBtns, 'data-day', stateDay);
+      render();
+    });
+  });
+  if (irregularBtn){
+    irregularBtn.addEventListener('click', ()=>{
+      showIrregular = !showIrregular;
+      irregularBtn.classList.toggle('isActive', showIrregular);
+      render();
+    });
+  }
+
+  // initial highlight
+  setActivePill(weekBtns, 'data-week', 'auto');
+  setActivePill(dayBtns, 'data-day', 'today');
   render();
 })();
 </script>
-
 </body>
 </html>

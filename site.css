@@ -121,7 +121,7 @@
     }
 
     .divider{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
-    .hidden{ display:none; }
+    .hidden{ display:none !important; }
 
     /* Results */
     .results{ margin-top: 12px; display:grid; gap: 10px; }
@@ -1362,114 +1362,226 @@ img{
 
 /* ===== Filter spacing ===== */
 .filterBar{ margin-bottom: 14px; }
-/* === Add: header mail icon (message templates) === */
-.siteHeader{
-  position: sticky; /* ensure positioned element for absolute icon */
+
+
+/* ===== Meyasubako lock ===== */
+.lockBox{
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgba(199,154,75,.30);
+  border-radius: 16px;
+  background: rgba(0,0,0,.14);
 }
-.siteHeader a.mailIcon{
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
+.lockText{
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,.85);
+}
+.lockRow{
+  display:flex;
+  gap:8px;
+}
+.lockRow input{
+  flex:1;
+}
+.lockRow button{
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(199,154,75,.35);
+  background: rgba(199,154,75,.16);
+  color: #ffe7be;
+  font-weight: 900;
+  cursor:pointer;
+}
+.lockError{
+  margin-top: 6px;
+  font-size: 12px;
+  color: #ffb3b3;
+}
+
+/* ===== Card grid / spacing safety (override) ===== */
+.suggestionGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+@media (min-width: 720px){
+  .suggestionGrid{ grid-template-columns: 1fr 1fr; }
+}
+.filterBar{ margin-bottom: 14px; }
+
+
+/* =========================
+   Header: mail icon button (home)
+   既存の見た目は維持しつつ、右側に✉を追加するための最小追記
+   ========================= */
+.siteHeaderInner{
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* タイトルリンク：既存 .siteHeader a の見た目を使い、レイアウトだけ上書き */
+.siteHeaderInner .siteTitleLink{
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* メールボタン：既存 .siteHeader a のブロック指定等を上書き */
+.siteHeaderInner .mailIconBtn{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  margin: 0;
-  max-width: none;
-  line-height: 1;
-  font-weight: 900;
-  font-size: 18px;
-  text-decoration: none;
-  color: rgba(255,255,255,.92);
-  border: 1px solid rgba(255,255,255,.18);
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
-  background: rgba(255,255,255,.06);
-  box-shadow: 0 8px 18px rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 10px 24px rgba(0,0,0,.22);
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 1;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 auto;
 }
-.siteHeader a.mailIcon:hover{
-  border-color: rgba(199,154,75,.60);
-  color: rgba(255,255,255,.98);
+.siteHeaderInner .mailIconBtn:hover{
+  background: rgba(199,154,75,.18);
+  border-color: rgba(199,154,75,.45);
 }
 
-/* === Add: message template page === */
+/* 420px以下は、タイトルの既存縮小ルールを踏襲（レイアウトだけ維持） */
+@media (max-width: 420px){
+  .siteHeaderInner{
+    padding: 6px 10px;
+  }
+}
+
+/* =========================
+   Message templates page
+   ========================= */
 .templateControls{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(0,0,0,.14);
+  padding: 12px;
+  margin: 10px 0 14px;
+}
+.templateControlsRow{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  margin: 10px 0 14px;
-}
-.templateControls .control{
-  display:flex;
-  gap:8px;
   align-items:center;
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,.04);
+  justify-content: space-between;
 }
-.templateControls label{
-  font-size: 12px;
-  color: var(--muted);
+.templateControlsLeft{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
 }
-.templateControls select{
-  background: rgba(0,0,0,.25);
-  color: var(--text);
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 10px;
+.pillBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.18);
+  color: rgba(255,255,255,.88);
+  font-weight: 900;
+  font-size: 12px;
+  cursor: pointer;
+  user-select:none;
 }
+.pillBtn.isActive{
+  border-color: rgba(210, 170, 80, .45);
+  background: rgba(210, 170, 80, .18);
+  color: rgba(255, 240, 210, .95);
+}
+.pillBtn:focus{ outline: none; box-shadow: 0 0 0 3px rgba(199,154,75,.16); }
 
 .templateGrid{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap:12px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
-.templateCard{
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  font-size: 13px;
-  line-height: 1.45;
-  transition: .15s;
-  cursor: pointer;
-  user-select: none;
-}
-.templateCard:hover{
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-.templateCard .templateTitle{
-  font-weight: 850;
-  margin-bottom: 6px;
-}
-.templateCard pre{
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: rgba(255,255,255,.82);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12.5px;
+@media (min-width: 720px){
+  .templateGrid{ grid-template-columns: 1fr 1fr; }
 }
 
-.copyNotice{
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,.86);
-  color: rgba(255,255,255,.96);
-  padding: 8px 14px;
-  border-radius: 10px;
+.templateCard{
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+  overflow:hidden;
+}
+.templateCardHead{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.10);
+}
+.templateTitle{
+  font-weight: 950;
+  font-size: 14px;
+}
+.copyBtn{
+  border: 1px solid rgba(199,154,75,.30);
+  background: rgba(199,154,75,.12);
+  color: #ffe7be;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-weight: 950;
+  cursor: pointer;
+}
+.copyBtn:hover{ background: rgba(199,154,75,.16); }
+
+.templateBody{
+  padding: 10px 12px 12px;
+}
+.templateText{
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  padding: 10px 10px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,.16);
-  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.92);
   font-size: 13px;
+  line-height: 1.7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans JP", monospace;
+}
+.templateText:focus{ outline:none; box-shadow: 0 0 0 3px rgba(199,154,75,.14); border-color: rgba(199,154,75,.35); }
+
+.copyToast{
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.72);
+  color: rgba(255,255,255,.92);
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  font-weight: 950;
+  font-size: 12px;
   opacity: 0;
   pointer-events: none;
-  transition: .2s;
-  z-index: 2000;
+  transition: opacity .16s ease;
+  z-index: 9999;
 }
-.copyNotice.show{ opacity: 1; }
+.copyToast.show{ opacity: 1; }
+
