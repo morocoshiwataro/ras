@@ -6,150 +6,81 @@
   <title>メッセージテンプレート</title>
   <link rel="stylesheet" href="site.css">
   <style>
-    /* このページ専用：既存トンマナを壊さない範囲で見出しを強める */
-    .templateHeading{
-      margin: 18px 0 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(199,154,75,.32);
-      background: rgba(199,154,75,.12);
-      font-weight: 950;
-      letter-spacing: .02em;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .templateHeading .hIcon{
-      width: 24px; height: 24px;
-      display:inline-grid; place-items:center;
-      border-radius: 10px;
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.14);
-      flex: 0 0 auto;
-    }
+    .tplHero{ margin: 10px 0 14px; }
+    .tplHeroTitle{ margin:0 0 6px; font-size:14px; font-weight:950; letter-spacing:.02em; color:rgba(255,255,255,.92);
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .tplHeroBadges{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tplBadge{ font-size:12px; padding:3px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.22); color:rgba(255,255,255,.86); font-weight:900; }
 
-    .templateGrid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    @media (min-width: 720px){
-      .templateGrid{ grid-template-columns: 1fr 1fr; }
-    }
+    .tplSection{ margin-top:18px; }
+    .tplHeading{ margin:0 0 10px; padding:10px 12px; border-radius:12px; font-size:15px; font-weight:950; letter-spacing:.02em;
+      background:rgba(199,154,75,.16); border:1px solid rgba(199,154,75,.28); color:rgba(255,255,255,.95);
+      display:flex; align-items:center; gap:10px; }
+    .tplHeading .ico{ width:22px; height:22px; display:inline-grid; place-items:center; border-radius:8px;
+      background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.12); font-size:14px; flex:0 0 auto; }
 
-    .templateCard{
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 16px;
-      padding: 12px;
-      background: rgba(255,255,255,.04);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-    .templateCard:hover{
-      border-color: rgba(199,154,75,.45);
-      background: rgba(255,255,255,.05);
-    }
-    .templateText{
-      font-size: 13px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-    .templateMeta{
-      margin-top: 8px;
-      font-size: 12px;
-      color: rgba(255,255,255,.65);
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .copyHint{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.18);
-      color: rgba(255,255,255,.80);
-      font-weight: 900;
-    }
+    .templateGrid{ display:grid; grid-template-columns:1fr; gap:10px; }
+    @media (min-width:720px){ .templateGrid{ grid-template-columns:1fr 1fr; } }
 
-    .copyToast{
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.82);
-      color: rgba(255,255,255,.92);
-      font-weight: 950;
-      font-size: 13px;
-      z-index: 9999;
-      opacity: 0;
-      pointer-events:none;
-      transition: opacity .15s ease;
-    }
-    .copyToast.show{ opacity: 1; }
+    .templateCard{ border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:12px;
+      background:rgba(255,255,255,.04); cursor:pointer; position:relative; overflow:hidden; }
+    .templateCard:hover{ border-color:rgba(199,154,75,.45); background:rgba(255,255,255,.05); }
 
-    .templateNote{
-      margin: 6px 0 12px;
-      color: rgba(255,255,255,.70);
-      font-size: 12px;
-      line-height: 1.6;
-    }
+    .templateText{ font-size:13px; line-height:1.75; white-space:pre-wrap; color:rgba(255,255,255,.92); }
+    .copyHint{ margin-top:10px; font-size:12px; color:rgba(255,255,255,.70); display:flex; align-items:center; gap:8px; font-weight:900; }
+    .copyPill{ display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:900;
+      border:1px solid rgba(199,154,75,.30); background:rgba(199,154,75,.12); color:rgba(255,242,220,.92); }
+
+    .copyNotice{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.80); color:rgba(255,255,255,.95); font-weight:950; font-size:13px;
+      z-index:9999; opacity:0; pointer-events:none; transition:opacity .12s ease;
+      box-shadow:0 18px 44px rgba(0,0,0,.30); white-space:nowrap; }
+    .copyNotice.show{ opacity:1; }
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <div class="siteHeader">
-      <a href="home.html">【ras】鯛せんべい用：まとめサイト</a>
+    <div class="siteHeader"><a href="home.html">【ras】鯛せんべい用：まとめサイト</a></div>
+
+    <div class="tplHero" aria-live="polite">
+      <div class="tplHeroTitle">
+        <span>📋 テンプレート一覧</span>
+        <span class="tplHeroBadges">
+          <span class="tplBadge" id="badgeWeek">—</span>
+          <span class="tplBadge" id="badgeDay">—</span>
+        </span>
+      </div>
+      <div class="sub" style="margin-top:0">カードをクリックするとコピーできます。</div>
     </div>
 
-    <div class="headingBig">📋 テンプレート（クリックでコピー）</div>
+    <section class="tplSection">
+      <div class="tplHeading"><span class="ico">📅</span>毎日のお知らせテンプレート（本日分）</div>
+      <div id="dailyTemplates" class="templateGrid"></div>
+    </section>
 
-    <!-- 1段：毎日（今日の1枚だけ） -->
-    <div class="templateHeading">
-      <span class="hIcon">📅</span>
-      <span>毎日のお知らせテンプレート</span>
-    </div>
-    <div class="templateNote">今日が「通常週」か「エスコマ週」か／何曜日かを判定して、該当の1枚だけ表示します（金曜は3週ローテ）。</div>
-    <div id="dailyTemplates" class="templateGrid"></div>
+    <section class="tplSection">
+      <div class="tplHeading"><span class="ico">🗓</span>週のお知らせテンプレート（今週分）</div>
+      <div id="weeklyTemplates" class="templateGrid"></div>
+    </section>
 
-    <!-- 2段：週（今日の1枚だけ） -->
-    <div class="templateHeading">
-      <span class="hIcon">🗓</span>
-      <span>週のお知らせテンプレート</span>
-    </div>
-    <div class="templateNote">今日が「通常週」か「エスコマ週」かを判定して、該当の1枚だけ表示します。</div>
-    <div id="weeklyTemplates" class="templateGrid"></div>
+    <section class="tplSection">
+      <div class="tplHeading"><span class="ico">🌍</span>国のイベントテンプレート</div>
+      <div id="nationTemplates" class="templateGrid"></div>
+    </section>
 
-    <!-- 3段：国イベント（全部表示） -->
-    <div class="templateHeading">
-      <span class="hIcon">🌍</span>
-      <span>国のイベントテンプレート</span>
-    </div>
-    <div id="nationTemplates" class="templateGrid"></div>
-
-    <!-- 4段：その他（全部表示 / 旧イレギュラー） -->
-    <div class="templateHeading">
-      <span class="hIcon">🛠</span>
-      <span>その他対応用テンプレート</span>
-    </div>
-    <div id="miscTemplates" class="templateGrid"></div>
+    <section class="tplSection">
+      <div class="tplHeading"><span class="ico">🛠</span>その他対応用テンプレート</div>
+      <div id="miscTemplates" class="templateGrid"></div>
+    </section>
   </div>
 
-  <div class="copyToast" id="copyToast">コピーしました</div>
+  <div class="copyNotice" id="copyNotice">コピーしました</div>
 
 <script>
 (function(){
-
-  // ===== 週判定：home.html と同じロジック =====
-  const ANCHOR_MONDAY = new Date(Date.UTC(2026, 0, 20)); // 2026-01-20（エスコマ週の基準）
+  const ANCHOR_MONDAY = new Date(Date.UTC(2026, 0, 20)); // home.htmlと同じ基準
   const FRIDAY_ROTATION = [
     "氷原の戦い（21:00～）",
     "ギルド大乱闘（21:00～）",
@@ -158,7 +89,7 @@
 
   function startOfWeekMondayUTC(d){
     const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-    const day = (x.getUTCDay() + 6) % 7; // Mon=0 ... Sun=6
+    const day = (x.getUTCDay() + 6) % 7;
     x.setUTCDate(x.getUTCDate() - day);
     x.setUTCHours(0,0,0,0);
     return x;
@@ -169,134 +100,122 @@
     return Math.round(diff / ms);
   }
 
+  const DAILY_ESUKOMA = {
+    1: "",
+    2: `＜本日のイベント＞\n\n21時～　　ギルドパーティー\n21時半～　ギルド守衛戦\n\n【ギルド守衛戦】\n\nギルド周辺に光るマスが出てきます。\nそのマスに[ras]とついたゾンビが出現し、\n攻撃するとギルドコイン等がもらえます。\n\n進軍時間は場所に関わらず「30秒」です。\n避難所からの距離は関係ありません！\n\n後半につれて硬くなってくるので、\n序盤はバラバラに、後半は全部隊同じゾンビに…\nといった具合に工夫すると◎\n\nうまくばらけつつ、効率よく倒しましょう！`,
+    3: `＜本日のイベント＞\n\n21時～　スピーカートラップ\n\n【スピーカートラップ】\n\n領地中央の「スピーカートラップ」に\nライダー1体（※）でギャザーを出します。\n（ギャザーはあればあるほどよいです！）\n\n残った進軍枠で、他の人のギャザーに\n自分の最強メンバーで乗ります。\n\n30分これを繰り返し、与えたダメージに応じて\nモジュール・ギルドコイン・資源がもらえます！\n\n\n\n※5部隊フルで兵士を揃えられる人は\nギャザーにライダーをたくさん乗せても◎`,
+    4: `＜本日のイベント＞\n\n21時～　　ギルドパーティー\n21時半～　ギルド守衛戦\n\n【ギルド守衛戦】\n\nギルド周辺に光るマスが出てきます。\nそのマスに[ras]とついたゾンビが出現し、\n攻撃するとギルドコイン等がもらえます。\n\n進軍時間は場所に関わらず「30秒」です。\n避難所からの距離は関係ありません！\n\n後半につれて硬くなってくるので、\n序盤はバラバラに、後半は全部隊同じゾンビに…\nといった具合に工夫すると◎\n\nうまくばらけつつ、効率よく倒しましょう！`,
+    5: "",
+    6: "",
+    0: `＜本日のイベント＞\n\n21時～　スピーカートラップ\n\n【スピーカートラップ】\n\n領地中央の「スピーカートラップ」に\nライダー1体（※）でギャザーを出します。\n（ギャザーはあればあるほどよいです！）\n\n残った進軍枠で、他の人のギャザーに\n自分の最強メンバーで乗ります。\n\n30分これを繰り返し、与えたダメージに応じて\nモジュール・ギルドコイン・資源がもらえます！\n\n\n\n※5部隊フルで兵士を揃えられる人は\nギャザーにライダーをたくさん乗せても◎`
+  };
+
+  const DAILY_NORMAL = {
+    1: "",
+    2: `＜本日のイベント＞\n\n21時～　ギルドパーティー\n21時～　デッドライジング\n\n【デッドライジング】\n\n避難所に連続してゾンビが攻めてきます。\n1～20Lvと順に攻撃してきますが、\nLv7、14、17が「変異ゾンビ」で強力です。\n（Lv10、20は避難所でなくギルド要塞）\n\n2回負けると終了になってしまうので、\n戦況報告を確認（※）しつつ、\n攻撃側（左）の戦死数が100％を切ったら\nギルチャで増援を要請しましょう！\n（避難所の座標を貼るとスムーズです◎）\n\n※戦況は メール ＞ 戦況報告 で確認！`,
+    3: `＜本日のイベント＞\n\n21時～　スピーカートラップ\n\n【スピーカートラップ】\n\n領地中央の「スピーカートラップ」に\nライダー1体（※）でギャザーを出します。\n（ギャザーはあればあるほどよいです！）\n\n残った進軍枠で、他の人のギャザーに\n自分の最強メンバーで乗ります。\n\n30分これを繰り返し、与えたダメージに応じて\nモジュール・ギルドコイン・資源がもらえます！\n\n\n\n※5部隊フルで兵士を揃えられる人は\nギャザーにライダーをたくさん乗せても◎`,
+    4: `＜本日のイベント＞\n\n21時～　ギルドパーティー\n21時～　デッドライジング\n\n【デッドライジング】\n\n避難所に連続してゾンビが攻めてきます。\n1～20Lvと順に攻撃してきますが、\nLv7、14、17が「変異ゾンビ」で強力です。\n（Lv10、20は避難所でなくギルド要塞）\n\n2回負けると終了になってしまうので、\n戦況報告を確認（※）しつつ、\n攻撃側（左）の戦死数が100％を切ったら\nギルチャで増援を要請しましょう！\n（避難所の座標を貼るとスムーズです◎）\n\n※戦況は メール ＞ 戦況報告 で確認！`,
+    5: "",
+    6: `＜本日のイベント＞\n\n19時～　エンパイアウォー（VC）\n\nイベントが始まったら\n他国から攻撃があります！注意！\n\n\n■攻撃する予定がない人\n始まる前に8時間シールドを使っておき、\n始まったら24時間に切り替えましょう！\n1000ダイヤで資源が守れます！安い！！\n\nシールドを張っていても、増援は出せるので\nギルメンを守って戦闘ポイントを稼ぐのも◎\n\n\n■他国へ攻撃に行く予定の人\nギルドの敷地内で攻撃すると、\n氷結で固定されてボコられることがあります\n\nまた、怖い人に横付けされてボコられる\nこともあるので、ゾンビや障害物などで\n真横に避難所を並べられない場所取りが◎\n\nなお、他国でも自国同士のNAPは有効です。\n避難所攻撃・採集（ダイヤも）被りの時には\n細心の注意をはらってください。\n\n\n■ダイヤが掘れます！\n奇数時間の1分に出ます。`,
+    0: `＜本日のイベント＞\n\n21時～　スピーカートラップ\n\n【スピーカートラップ】\n\n領地中央の「スピーカートラップ」に\nライダー1体（※）でギャザーを出します。\n（ギャザーはあればあるほどよいです！）\n\n残った進軍枠で、他の人のギャザーに\n自分の最強メンバーで乗ります。\n\n30分これを繰り返し、与えたダメージに応じて\nモジュール・ギルドコイン・資源がもらえます！\n\n\n\n※5部隊フルで兵士を揃えられる人は\nギャザーにライダーをたくさん乗せても◎`
+  };
+
+  const WEEKLY_ESUKOMA = `＜エスコマ週スケジュール＞\n\n【月】\n英雄獲得\n\n【火】\n建築＆研究（追加戦力）\n\n【水】\nスタミナ＆AP＆資源採集\n\n【木】\n訓練ブースト\n　※訓練ブースト：終日可能性あり\n\n【金】\n器官強化＆ギア獲得\n　※器官(刑務所)：17時～25時\n\n【土】\n強化材料＆改造　★守衛戦報酬\n　※装備＆モジュール：9時～17時\n　※チップ＆キューブ：9時～17時\n\n【日】\n建築＆研究＆訓練\n\n※獅子奮迅の可能性\n5分前終了なので注意！`;
+
+  const WEEKLY_NORMAL = `＜通常週スケジュール＞\n\n【月】\n・英雄強化\n\n【火】\n・避難所強化\n（ブースト＋ハッピーガチャ）\n\n【水】★ギルド試練の報酬受取\n・装備強化\n（装備材料獲得＋ハッピーガチャ）\n・結晶核＆収蔵品\n（収蔵品開封）\n\n【木】\n・ミュータント＆モジュール\n　※モジュール　：9時～17時\n　※ミュータント：25時～翌8時\n\n【金】\n・栄誉＆器官強化＆メカ材料\n　※器官(刑務所)：17時～25時\n　※グローリー　：25時～翌9時\n\n【土】\n・ダイヤの達人（1日目）\n　※ダイヤ：25時～翌9時\n\n【日】\n・ダイヤの達人（2日目）\n・チップ＆キューブ\n\n※獅子奮迅の可能性\n5分前終了なので注意！`;
+
+  const NATION = {};
+  const MISC = {};
+
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const weekday = today.getUTCDay(); // Sun=0 ... Sat=6
+  const weekday = today.getUTCDay();
   const weekIndex = weeksBetween(ANCHOR_MONDAY, today);
-  const isEsukomaWeek = (weekIndex % 2 === 0); // 0週目＝エスコマ週
+  const isEsukomaWeek = (weekIndex % 2 === 0);
   const weekLabel = isEsukomaWeek ? "エスコマ週" : "通常週";
   const dayLabel = ["日","月","火","水","木","金","土"][weekday] + "曜日";
 
-  // 金曜ローテ
-  const fridayRot = ((weekIndex % 3) + 3) % 3;
-  const fridayEvent = FRIDAY_ROTATION[fridayRot];
+  const bw = document.getElementById("badgeWeek");
+  const bd = document.getElementById("badgeDay");
+  if (bw) bw.textContent = weekLabel;
+  if (bd) bd.textContent = dayLabel;
 
-  // ===== テンプレ本文（ここだけ編集すればOK）=====
-  // daily: 0(日)〜6(土) で書く
-  const TEMPLATES = {
-    daily: {
-      esukoma: {
-        0: "📣【日】スピーカートラップ（21:00～）\n（必要事項ここに追記）",
-        1: "📣【月】本日のギルドイベントはありません。\n（必要事項ここに追記）",
-        2: "📣【火】ギルドパーティー（21:00～）／ギルド守衛戦（21:30～）\n（必要事項ここに追記）",
-        3: "📣【水】スピーカートラップ（21:00～）\n（必要事項ここに追記）",
-        4: "📣【木】ギルドパーティー（21:00～）／ギルド守衛戦（21:30～）\n（必要事項ここに追記）",
-        5: "📣【金】{FRIDAY}\n（必要事項ここに追記）",
-        6: "📣【土】荒野の王（19:00～）\n（必要事項ここに追記）"
-      },
-      normal: {
-        0: "📣【日】スピーカートラップ（21:00～）\n（必要事項ここに追記）",
-        1: "📣【月】本日のギルドイベントはありません。\n（必要事項ここに追記）",
-        2: "📣【火】ギルドパーティー（21:00～）／デッドライジング（21:30～）\n（必要事項ここに追記）",
-        3: "📣【水】スピーカートラップ（21:00～）\n（必要事項ここに追記）",
-        4: "📣【木】ギルドパーティー（21:00～）／デッドライジング（21:30～）\n（必要事項ここに追記）",
-        5: "📣【金】{FRIDAY}\n（必要事項ここに追記）",
-        6: "📣【土】エンパイアウォー（19:00～）\n（必要事項ここに追記）"
-      }
-    },
-
-    weekly: {
-      esukoma: "📢【週のお知らせ】今週はエスコマ週です。\n（週の注意点・お願い等をここに追記）",
-      normal:  "📢【週のお知らせ】今週は通常週です。\n（週の注意点・お願い等をここに追記）"
-    },
-
-    nation: {
-      wk:     "🌍【国イベント】荒野の王（19:00～）\n（集合/注意点をここに追記）",
-      empire: "🌍【国イベント】エンパイアウォー（19:00～）\n（集合/注意点をここに追記）",
-      ice:    "🌍【国イベント】氷原の戦い（21:00～）\n（集合/注意点をここに追記）",
-      water:  "🌍【国イベント】浄水争奪戦（21:00～）\n（集合/注意点をここに追記）"
-    },
-
-    misc: {
-      irregular: "🛠【その他】イレギュラー対応\n（状況とお願いを書く）",
-      response:  "🛠【その他】対応お願いします\n（必要事項を書く）"
-    }
-  };
-
-  function fmtFriday(s){
-    return (s || "").replaceAll("{FRIDAY}", fridayEvent);
+  function fridayLabel(){
+    const rot = ((weekIndex % 3) + 3) % 3;
+    return FRIDAY_ROTATION[rot];
   }
 
-  function showToast(){
-    const t = document.getElementById("copyToast");
-    if (!t) return;
-    t.classList.add("show");
-    clearTimeout(showToast._timer);
-    showToast._timer = setTimeout(()=>t.classList.remove("show"), 900);
+  function showCopyNotice(){
+    const el = document.getElementById("copyNotice");
+    if (!el) return;
+    el.classList.add("show");
+    clearTimeout(showCopyNotice._t);
+    showCopyNotice._t = setTimeout(() => el.classList.remove("show"), 850);
   }
 
   async function copyText(text){
     try{
       await navigator.clipboard.writeText(text);
-      showToast();
+      showCopyNotice();
     }catch(e){
-      // フォールバック
       const ta = document.createElement("textarea");
       ta.value = text;
       ta.style.position = "fixed";
       ta.style.left = "-9999px";
       document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
+      ta.focus(); ta.select();
+      try{ document.execCommand("copy"); showCopyNotice(); }catch(_){}
       document.body.removeChild(ta);
-      showToast();
     }
   }
 
-  function addCard(container, text, meta){
-    const card = document.createElement("div");
-    card.className = "templateCard";
-    card.innerHTML = `
-      <div class="templateText"></div>
-      <div class="templateMeta">
-        <span class="copyHint">📋 クリックでコピー</span>
-        ${meta ? `<span>${meta}</span>` : ``}
-      </div>
-    `;
-    card.querySelector(".templateText").textContent = text;
-
-    card.addEventListener("click", ()=>copyText(text));
-    container.appendChild(card);
+  function addCard(container, text){
+    const div = document.createElement("div");
+    div.className = "templateCard";
+    div.innerHTML = '<div class="templateText"></div><div class="copyHint"><span class="copyPill">📋 クリックでコピー</span><span>（タップでもOK）</span></div>';
+    div.querySelector(".templateText").textContent = text;
+    div.addEventListener("click", () => copyText(text));
+    container.appendChild(div);
   }
 
-  // ===== 1) 毎日：今日の1枚だけ =====
-  const dailyEl = document.getElementById("dailyTemplates");
-  if (dailyEl){
-    const src = isEsukomaWeek ? TEMPLATES.daily.esukoma : TEMPLATES.daily.normal;
-    const raw = src[weekday] || "（テンプレ未設定）";
-    const text = fmtFriday(raw);
-    addCard(dailyEl, text, weekLabel + " / " + dayLabel);
+  function normalizeFriday(text){
+    if (!text) return text;
+    return text.split("{FRIDAY}").join(fridayLabel());
   }
 
-  // ===== 2) 週：今日の1枚だけ =====
-  const weeklyEl = document.getElementById("weeklyTemplates");
-  if (weeklyEl){
-    const text = isEsukomaWeek ? TEMPLATES.weekly.esukoma : TEMPLATES.weekly.normal;
-    addCard(weeklyEl, text, weekLabel);
+  // Daily: show only today
+  const dailyContainer = document.getElementById("dailyTemplates");
+  const dailyMap = isEsukomaWeek ? DAILY_ESUKOMA : DAILY_NORMAL;
+  let dailyText = normalizeFriday(dailyMap[weekday] || "");
+  if (dailyContainer){
+    if (!dailyText.trim()){
+      addCard(dailyContainer, "（本日分のテンプレートは、いったん無し）");
+    }else{
+      addCard(dailyContainer, dailyText);
+    }
   }
 
-  // ===== 3) 国イベント：全部 =====
-  const nationEl = document.getElementById("nationTemplates");
-  if (nationEl){
-    Object.values(TEMPLATES.nation).forEach(t => addCard(nationEl, t, "手動で選んでコピー"));
+  // Weekly: show only this week
+  const weeklyContainer = document.getElementById("weeklyTemplates");
+  if (weeklyContainer){
+    addCard(weeklyContainer, isEsukomaWeek ? WEEKLY_ESUKOMA : WEEKLY_NORMAL);
   }
 
-  // ===== 4) その他：全部 =====
-  const miscEl = document.getElementById("miscTemplates");
-  if (miscEl){
-    Object.values(TEMPLATES.misc).forEach(t => addCard(miscEl, t, "手動で選んでコピー"));
+  // Nation
+  const nationContainer = document.getElementById("nationTemplates");
+  if (nationContainer){
+    const vals = Object.values(NATION).filter(Boolean);
+    if (!vals.length) addCard(nationContainer, "（準備中）");
+    else vals.forEach(t => addCard(nationContainer, t));
   }
 
+  // Misc
+  const miscContainer = document.getElementById("miscTemplates");
+  if (miscContainer){
+    const vals = Object.values(MISC).filter(Boolean);
+    if (!vals.length) addCard(miscContainer, "（準備中）");
+    else vals.forEach(t => addCard(miscContainer, t));
+  }
 })();
 </script>
 </body>
